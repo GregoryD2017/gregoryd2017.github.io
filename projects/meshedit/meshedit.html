@@ -1,0 +1,767 @@
+---
+title: Meshedit
+layout: page
+hide: true
+---
+
+<<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+
+<div align = "middle">
+<img src="images/intro/header.PNG" align="middle" width="800px"/>
+</div>
+
+<div>
+<h2 align="middle">Overview</h2>
+<p class = "medium">
+Mesh Editor was an interesting foray into the world of 3D Graphics, and the underlying architecture that enables the geometric manipulations that power tools like Blender, and Maya. This project delves into both rendering Bezier curves and Bezier surfaces through a liberal application of <b>de Casteljau's algorithm</b>
+as well as manipulation of triangulated meshes, including edge flipping, edge splitting, and mesh subdivision.
+</p>
+
+<h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+<h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+
+<br><br>
+
+<div align = "middle">
+<img src="images/part1/curve3_0.PNG" align="middle" width="800px"/>
+</div>
+
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+In order to draw arbitrary splines, we leverage <b>de Casteljau’s algorithm</b>. In essence, the algorithm requires as inputs a series of control
+points of the curve we wish to interpolate. We will also need to define <var>t</var>, a quantity between 0 and 1. We will call all of these initial control
+points the 0th degree control points. Between each pair of adjacent control points, we draw a new intermediate control point at the location
+defined as the linear interpolation of the leftmost point and the rightmost point with parameter <var>t</var>. We repeat this process for each dual pair of
+adjacent 0th degree control points, to draw our 1st degree control points. Note that if we initially had <var>n</var> 0th degree control points, we will now
+have <var>n - 1</var> first degree control points. We will apply this process on our first degree control points, deriving 2nd degree control points, and
+similarly on second degree control points and 3rd degree control points etc. until we are left with a singular <var>(n - 1)</var> th degree control point.
+This is one point on the Bezier curve defined by the 0th degree control points. Modulating <var>t</var> to infinitesimally small degrees allows us to project
+the entire curve defined by our control points.
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+The implementation was a direct map of the aforementioned algorithm. At each function invocation, the input vector represented our <var>ith</var>
+degree control points. Between each adjacent pair in this vector, I simply linearly interpolated the points with curve parameter <var>t</var>,
+pushing these new points to a collection vector, and returning the collection vector at the end, which represented the <var>(i + 1)</var>
+degree control points.
+</p>
+</div>
+
+<br><br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/curve3_0.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 0</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/curve3_1.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 1</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/curve3_2.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 2</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/curve3_3.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 3</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/curve3_4.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 4</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/curve3_5.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 5</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+We can drag the control points around to see how they will modulate the underlying Bezier curve. Scrolling allows us to alter the linear interpolation
+parameter <var>t</var>, which helps to visualize the entire Bezier curve.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/curve3_mod.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 5: Altered Initial Control Points</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/curve3_mod_scrolled.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Stage 5: Altered Linear Interpolation Parameter</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+
+<h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
+
+<br><br>
+<div align = "middle">
+<img src="images/part2/teapot.PNG" align="middle" width="800px"/>
+<figcaption align="middle">Utah Teapot Rendered with Bezier Curves</figcaption>
+</div>
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+The extension from rendering Bezier curves to rendering Bezier surfaces is actually more straightforward than I expected.
+We can leverage separable 1-dimensional de Casteljau’s algorithm to interpolate point <var>(u, v)</var> on our Bezier patch.
+If we have <var>m</var> rows of original control points, each with <var>n</var> control points (<var>m</var> x <var>n</var>) control points
+total, we treat each row of <var>n</var> control points as the initial control points to a Bezier curve, and thus we can use de
+Casteljau’s algorithm to evaluate a point on each of the <var>m</var> curves, given linear interpolation parameter <var>u</var>
+(as a direct mirror to task 1). This will leave us with a set of <var>m</var> points, which we can again treat as the original control points
+of a Bezier curve, allowing us to again utilize de Casteljau’s algorithm to interpolate a point on this curve given linear interpolation
+parameter <var>v</var>. Thus we are left with a single point on our Bezier patch, which was evaluated at <var>(u, v)</var>.
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+Much like in task 1, the substance of the problem centers around evaluating de Casteljau’s algorithm. In part 1, we wrote a function
+(<code>evaluateStep</code>) that took as input a vector of control points and a linear interpolation parameter, and returned a vector of
+control points that corresponded to the subsequent stage of de Casteljau’s algorithm. For this part, we first write a function that
+will <code>evaluateStep</code> on a vector with argument <var>u</var>, and <code>evaluateStep</code> on the return to <code>evaluateStep</code>
+perpetually, until we interpolate our singular point on the Bezier curve; we can call this function <code>evaluate1D</code>. Thus, appealing
+to our algorithm described above, we need only call <code>evaluate1D</code> with parameter <var>u</var> on all of our rows of control points,
+each stored as a vector in the Bezier patch, pushing the resulting interpolated points into another vector, on which we will again call
+<code>evaluate1D</code> with parameter <var>v</var> to interpolate the actual point on our Bezier patch.
+</div>
+</p>
+
+<br><br>
+
+
+<h2 align="middle">Section II: Sampling</h2>
+
+
+<h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
+
+<div align = "justify">
+<p class = "medium">
+Thankfully, the half-edge mesh makes computing area-weighted vertex normals quite elegant. The following pseudocode gives the outline: <br>
+</div>
+</p>
+
+<div align = "left">
+<code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Initialize a tracker for total area (TA), and total vector sum (TVS)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For each vertex:
+<ol>
+<li>Query the initial half-edge rooted at this vertex (h = v->halfedge()). </li>
+<li>Retrieve h’s face, and query the face’s normal vector (face_norm = h->face()->norm()). </li>
+<li>Compute the area of the face.</li>
+<li>Add area to TA</li>
+<li>Add area * face_norm to TVS</li>
+<li>Repeat steps 1-5 for all adjacent faces to the given vertex</li>
+</ol>
+</div>
+</code>
+
+<div align = "justify">
+<p class = "medium">
+To find all adjacent faces of a vertex given our initial vertex <code>v</code> and halfedge <code>h</code>, we can get the half-edge of
+the next face by finding <nobr><code>h->twin()->next()</code></nobr>, and from here we can query the for loop again. We repeat for each face until we
+loop back to <code>h</code>. <br>
+</div>
+</p>
+
+<br><br>
+
+<div align = "middle">
+<img src="images/part3/area.png" align="middle" width="800px"/>
+<figcaption align="middle">Area of Triangulated Face: Iteration Walkthrough</figcaption>
+</div>
+
+<br><br>
+
+
+<div align = "justify">
+<p class = "medium">
+We can calculate the area of a triangulated face given one vertex on the face by calling on the following routine (please see the accompanying
+diagram for clarity):
+</div>
+</p>
+
+<div align = "left">
+<code>
+<ol>
+<li>Get the position of y (y_pos = h->twin()->vertex()->position) </li>
+<li>Get the position of z (z_pos = h->next()->next()->vertex()->position)</li>
+<li>Take half their cross product (0.5 * cross(y_pos, z_pos))</li>
+</ol>
+</div>
+</code>
+<br>
+
+<div align = "justify">
+<p class = "medium">
+Then all we need to do is return TVS / TA.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part3/teapot_flatshading.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Utah Teapot: Flat Shading</figcaption>
+      </td>
+      <td>
+        <img src="images/part3/teapot_phongshading.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Utah Teapot: Phong Shading</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+
+<h3 align="middle">Part 4: Half-edge flip</h3>
+
+<div align = "justify">
+<p class = "medium">
+To implement edge flips, I followed the guidelines specified by this helpful <a href="http://15462.courses.cs.cmu.edu/fall2015content/misc/HalfedgeEdgeOpImplementationGuide.pdf" target = "_blank">link</a>
+from the folks at CMU. The essence of this guide is as follows. First we save a pointer (in the form of an Iterator) for each of the half edges,
+vertices, edges, and faces from our starter mesh. Next, since edge flips do not utilize new elements, we can simply assign our elements such that
+our central edge flips the vertices from which it is rooted, and thus all corresponding vertices, edges, faces, and halfedge pointers are updated
+as a result. As per the guide, we element assign <b>every</b> half edge, vertex, edge, and face regardless of whether or not edge flipping alters its
+starting state.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part4/pre_edgeflip.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube: Starter Mesh (No Edits)</figcaption>
+      </td>
+      <td>
+        <img src="images/part4/post_edgeflip.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube: Post Edge Flips</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+
+<div align = "justify">
+<p class = "medium">
+This process is really difficult to internalize through text, thus the provided diagram documents the procedure pictorially.
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+<img src="images/part4/edge_flip.png" align="middle" width="800px"/>
+<figcaption align="middle">Edge Flip Walkthrough</figcaption>
+</div>
+
+<br>
+
+<div align = "justify">
+<p class = "medium">
+Concretely, the guide tells us to do the following. We’ll take a look at the picture on the left side, and attempt to take a freeze frame of the
+state of the elements (edges, faces etc.). What this means is that we’ll generate variables for each of the mesh components to start. Next we’ll
+check to see whether or not we ought to be generating new mesh components. It turns out for edge flips, the starter components are sufficient, so
+we can just pass this step for now. Now we will modify the mesh by using the variables generated above and assigning their corresponding fields
+based on the picture on the right side, the flipped edge side. Finally, if our mesh renovation deletes components, we’ll do that as the final step,
+but again with edge flips we can just skip this step.
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+Truthfully, debugging was quite straightforward in this case. I noticed that edge flipping once, then flipping the base of the newly set triangle
+would propagate a mesh tear. I simply checked the neighbour assignments, and found an incorrect setting for the vertex of a half edge. Updating this
+parameter quickly remedied the issue.
+</div>
+</p>
+
+
+<h3 align="middle">Part 5: Half-edge split</h3>
+
+<div align = "justify">
+<p class = "medium">
+As with task 4, the implementation of this part is quite straightforward, by following the earlier link. Simply begin by saving pointers for each
+of the half edges, vertices, edges, and faces. This time we will need to create 1 vertex, 3 edges, 2 faces, and 6 half-edges. Then, using the
+diagram I included above, I was able to sequentially assign all neighbours and attributes for every half edge, vertex, edge, and face to account
+for the new central vertex, and the vertices that radiate out from it. It is important to note, the new vertex generated is positioned at the
+midpoint of the edge it cuts.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part5/pre_edgesplit.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube: Starter Mesh (No Edits)</figcaption>
+      </td>
+      <td>
+        <img src="images/part5/post_edgesplit.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube: Post Edge Splits</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part5/edgesplit_preflip.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube: Post Edge Splits</figcaption>
+      </td>
+      <td>
+        <img src="images/part5/edgesplit_edgeflip.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube: Post Edge Splits and Edge Flips</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+Edge splits are perhaps even more tedious to explain in text than edge flips are, so again, the diagram should elucidate the general methodology.
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+<img src="images/part5/edge_split.png" align="middle" width="800px"/>
+<figcaption align="middle">Edge Split Walkthrough</figcaption>
+</div>
+
+<br>
+
+<div align = "justify">
+<p class = "medium">
+Again put concretely we’ll essentially use the same walkthrough as task 4. We’ll take a look at the picture on the left side, and attempt to
+take a freeze frame of the state of the elements (edges, faces etc.). What this means is that we’ll generate variables for each of the mesh
+components to start. Next we’ll check to see whether or not we ought to be generating new mesh components. For mesh splits, we will need to
+generate 1 vertex, 3 edges, 2 faces, and 6 halfedges (in fact, my implementation creates 1 vertex, 4 edges, 4 faces, and 8 halfedges just because
+the component mapping was slightly more intuitive for me that way). Now we will modify the mesh by using the variables generated above and
+assigning their corresponding fields based on the picture on the right side, the split edge side (an example has been done in the diagram for
+reference). Finally, for edge splits, we will not need to delete components, however in my implementation, we actually did delete one edge,
+two half edges, and 2 faces (to account for the extra components created).
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+Surprisingly, this did not require any debugging. Being super careful in the diagram generation, and following it absolutely meant that this
+worked right after implementation. Lucky.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part5/boundary_presplit.PNG" align="middle" width="500"/>
+        <figcaption align="middle">VW Beetle Window: Starter Mesh (No Edits)</figcaption>
+      </td>
+      <td>
+        <img src="images/part5/boundary_postsplit.PNG" align="middle" width="500"/>
+        <figcaption align="middle">VW Beetle Window: Post Edge Splits</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+<b>Extra Credit:</b> Note the boundary edges split correctly as well. Instead of leaving boundary edges unsplit, I simply split the boundary
+triangle in two, by dividing the midpoint of the boundary edge with a vertex, and assigning neighbour elements to account for the new face.
+</div>
+</p>
+
+<br>
+
+
+<h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+
+<br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/teapot_1.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Utah Teapot: Starter Mesh (No Subdivision)</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/teapot_4.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Utah Teapot: 4x Loop Subdivision</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+<div align = "left">
+<p class = "medium">
+<b><i>Loop Subdivision: A Walkthrough:</i></b>
+</div>
+</p>
+
+<br><br>
+
+<div align = "middle">
+<img src="images/part6/weighting_walkthrough.png" align="middle" width="800px"/>
+<figcaption align="middle">Vertex Weighting Walkthrough</figcaption>
+</div>
+
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+Loop subdivision allows for a lightweight yet efficacious mode of upsampling triangulated meshes. The first step is to calculate the new positions
+for all of the vertices in our starter mesh (we’ll ignore boundary vertices at first, since this introduces a new layer of complexity). Thus,
+iterating over all the vertices in our starter mesh, we employ the following scheme to redraw weights for existing vertices. First, add together
+each of the positions of all neighbouring vertices of <var>v</var>. Then, set the <code>newPosition</code> field of <var>v</var> to be
+<code>(1 - deg(v) * u) * v->position + deg(v) * sumNeighbourPositions)</code>, where if the degree of <var>v</var> is 3, <var>u</var> is (3/16),
+and otherwise, <var>u</var> is (3/(deg(v) * 8)). While we’re iterating through all our initial vertices, we will set
+their <code>isNew</code> tracker flags to be false (we’ll see why later).
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+As we know, in loop subdivision, we will add a new vertex on every starter edge, and we will of course need to assign a position to these new
+vertices as well, so we begin by iterating through all of the starter edges. For every edge, we can calculate the position of the new vertex
+on that edge and summarily set the <code>newPosition</code> attribute of our edge to be (3/8)*(<var>A</var> + <var>B</var>) + (1/8)(<var>C</var> + <var>D</var>)
+where <var>A</var>, <var>B</var>, <var>C</var>, and  <var>D</var> are the positions of the vertices defined in the above diagram. Of course these
+edges are all starter edges, so we will set their <code>isNew</code> tracker flags to be false as well. Simultaneously, we will create a
+tracking array of <code>old_edges</code>, and push all edges we iterate over into this array.
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+Now, with all the mise en place complete, we can begin the actual mesh modifications. We start by splitting all of the starter edges (in <code>old_edges</code>)
+of the mesh (see now why we tracked all the old edges?). We can leverage our <code>splitEdge</code> function from task 5 to do this easily, however, we will
+make a tiny alteration to this function; when an edge is split, we assign the new vertex’s <code>newPosition</code> field to be the <code>newPosition</code> field of the
+split edge.
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+The second to last step in loop subdivision is to flip every edge that links two starter vertices, so we can simply iterate through all our edges
+and check, flipping edges with our <code>edgeFlip</code> function from task 4 as aforementioned.
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+Finally, all we need to do is push the updates to the vertex positions, so for all vertices, just set their <code>position</code> field to be
+equal to their <code>newPosition</code> field!
+</div>
+</p>
+
+<br>
+
+<div align = "left">
+<p class = "medium">
+<b><i>Upsample Dulling, or The Problem With Edges and Corners:</i></b>
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+For many meshes, subdivision smoothes the low-poly appearance of a model, which stands to reason. Features become more detailed as the mesh
+becomes more granular, and the model appears to be higher quality (see the teapot comparison above).
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/torus_nosplit_1.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Torus: No Preprocessing (No Subdivision)</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/torus_nosplit_3.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Torus: No Preprocessing (3x Subdivision)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+Unfortunately, edges and corners don’t hold up well under loop subdivision. As we subdivide the mesh, if we observe the way the loop subdivision
+scheme functions, essentially for positions of new vertices, we blend and smooth our mesh by taking an average position of neighbouring vertices,
+and reweight our starter vertices similarly. As a result, sharp mesh elements, like edges and corners are dulled with successive subdivisions
+as they regress to the vertices neighbouring them.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/torus_presplit_1.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Torus: Preprocessing (No Subdivision)</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/torus_postsplit_3.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Torus: Preprocessing (3x Subdivision)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+We can temper this effect a bit, by pre-splitting some edges, although this is far from the sharpness that would be acceptable for creasing.
+Observe in the torus below, we pre-split some of the edges on one side of the donut. Later when we subdivide, the general edge and corner shape
+is apparent, considerably more so than without preprocessing.
+</div>
+</p>
+
+<br>
+
+<div align = "left">
+<p class = "medium">
+<b><i>Asymmetric Upsampling:</i></b>
+</div>
+</p>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/cube_nopreprocess.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube.dae: No Preprocessing (No Subdivision)</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/cube_nopreprocess_subdiv.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube.dae: No Preprocessing (Subdivided)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+The issue that causes the weird asymmetry when subdividing the cube is actually an underlying artifact of the mesh’s triangulation. Notice that the
+underlying geometry triangulation splits each face along only one diagonal? The effect of this is that when the triangles are subdivided, all new
+triangles will be oriented exactly as the starter triangles were.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/cube_asymmetric_reweight.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube.dae: Asymmetric Subdivision</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/cube_symmetric_reweight.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube.dae: Symmetric Subdivision</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+The intuition becomes starkly apparent when we compare the subdivision right before the reweighting of our asymmetric triangulation
+and our symmetric triangulation. New point positions will be calculated (and starter vertex positions will be reweighted) according to a linear
+combination of neighbour vertex positions. Intuitively, if the triangulation of our mesh leaves vertices only in one orientation, linear
+combinations of the vertices will necessarily mirror this orientation. Put another way, asymmetry in the initial triangulation will lead to
+asymmetry in the first subdivision, which in turn leads to asymmetry in the second subdivision ad infinitum.
+</div>
+</p>
+
+<br><br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/cube_preprocess.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube.dae: Preprocessing (No Subdivision)</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/cube_preprocess_subdiv.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cube.dae: Preprocessing (Subdivided)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br><br>
+
+<div align = "justify">
+<p class = "medium">
+We can fix this issue by splitting every diagonal edge first, thereby imposing a symmetric distribution of vertices. Essentially now, since the
+initial triangulation is symmetric, any additional vertices will be symmetrically added, and symmetrically reweighted as well.
+</div>
+</p>
+
+<br>
+
+<div align = "left">
+<p class = "medium">
+<b><i>Boundaries:</i></b>
+</div>
+</p>
+
+<div align = "justify">
+<p class = "medium">
+Boundaries are weird. Supposedly I should be able to iterate through all starter vertices, and if I find a boundary vertex, I need to reweight this
+vertex such that it has position: (1/8) * A + (3/4) * B + (1/8) * C. Then for all boundary edges, I simply need to put a vertex such that it cuts
+the original edge at the center. Did this work?
+</div>
+</p>
+
+<br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/beetle_boundary_presubdiv.PNG" align="middle" width="500"/>
+        <figcaption align="middle">VW Beetle Window: No Subdivision</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/beetle_boundary.PNG" align="middle" width="500"/>
+        <figcaption align="middle">VW Beetle Window: Subdivided</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br>
+
+<div align = "justify">
+<p class = "medium">
+Kind of... we can see that this new scheme certainly doesn’t ignore boundary elements, but it looks a little odd. There seems to be noise in the
+mesh. The fact that the subdivision occurs correctly however, the positions of new boundary triangles are just a little off leads me to believe
+that I am misinterpreting some part. I think I may be misunderstanding the weighting system, but of the numerous articles I consulted to figure
+this part out, they all point to this same weighting scheme. On the brightside, at least it doesn’t crash upsampling the Beetle car.
+</div>
+</p>
+
+<br>
+
+<div align = "left">
+<p class = "medium">
+<b><i>Triadic Subdivision:</i></b>
+</div>
+</p>
+
+<br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/cow_orig.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cow: Starter Mesh (No Subdivision)</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/cow_triadic.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Cow: Triadic Subdivision</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br>
+
+<br>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part6/teapot_loop_5.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Utah Teapot: 5x Loop Subdivision</figcaption>
+      </td>
+      <td>
+        <img src="images/part6/teapot_triadic_5.PNG" align="middle" width="500"/>
+        <figcaption align="middle">Utah Teapot: 5x Triadic Subdivision</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br>
+
+<div align = "justify">
+<p class = "medium">
+This is an interesting alternate subdivision mode. The basis for this mode of upsampling is as follows: first, we will precalculate (as in loop
+subdivision) the <code>newPosition</code> parameter of all the starter vertices. Iterating through the vertices, triadic subdivision tells us that
+the weight of old vertices should be equal to <code>(1 - alpha) * v->position + alpha * avgNeighbourPosition; alpha is equal to (4 - 2 * cos(2pi / deg(v)) / 9)</code>.
+Having done this, the next step is to place a new vertex at the centroid of each face of the starter mesh. All that’s left to do is to add new
+edges connecting the centroids to the vertices of the triangles in which they are rooted, and reset halfedges, edges, vertices, and faces as in
+tasks 4 and 5. Finally, for all the vertices for which we previously computed a <code>newPosition</code> field, we push the <code>newPosition</code>
+to the <code>position</code> field and we’re done!
+</div>
+</p>
+
+<br>
+
+</body>
+</html>
