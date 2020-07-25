@@ -773,5 +773,336 @@ keep sampling before we max out at <code>ns_aa</code> samples.
 </p>
 </div>
 
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/intro/CBbunny.png" align="middle" width="300"/>
+      </td>
+      <td>
+        <img src="images/intro/CBlucy.png" align="middle" width="300"/>
+      </td>
+      <td>
+        <img src="images/intro/CBdragon.png" align="middle" width="300"/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br><br>
+
+<div>
+
+
+<br><br>
+
+<h2 align="middle">Section I: Glass and Mirrors</h2>
+
+<h3 align="middle">Variation in Max Ray Depth</h3>
+
+<div align = "justify">
+<p class = "medium">
+<i>All images rendered with 256 samples per pixel and 4 light rays per sample.</i>
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/spheres0.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 0)</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/spheres1.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 1)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div align = "justify">
+<p class = "medium">
+Notice on the left, with maximal ray depth 0, we see only the light's illumination. If light is not allowed to
+bounce even once, only direct light emission is captured in our render. In other words, only objects that directly
+emit light (such as the overhead light in our Cornell box) can be seen. Looking on the right, with maximal ray depth 1
+we start to see the other objects in our scene. One light bounce means only the direct light that falls on an object
+is visible. We can now see the walls, and the floor as well as the spheres, but notice that the spheres are completely
+black. As a small spoiler, we know that the left sphere is a mirror sphere, and the right sphere is a glass sphere
+thus only the parts of the spheres with direct illumination (the small patches of white at the top) are lit at all.
+Intuitively, this makes sense; mirror and glass require reflection and refraction, but both of these lighting effects
+are derived from minimally 2 light bounces, thus the spheres fail to render properly. In other words, when we sample
+our reflective BRDF, we query the spectrum arriving from another point. If the other point is the light, then the surface is lit
+(see the small white patches on the spheres). For the most part however, the reflected light is nonexistent, since the light bounce samples
+non-emissive surfaces.
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/spheres2.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 2)</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/spheres3.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 3)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div align = "justify">
+<p class = "medium">
+As we increase the number of light bounces, the materials themselves will begin to resemble realistic glass and mirrors.
+At this point, it is probably useful to describe how exactly reflections and refractions are computed. We eschew the Fresnel
+Equations in determining glass modelling in favor of the less computationally intense Schlick's approximation (in essence,
+we happily ignore the case where a light ray reflects and refracts). For a light ray, we can probabilistically choose whether
+it reflects or refracts using Schlick's coefficient. Reflection is trivial to generate, while refraction is simply an encoding of
+Snell's law. It is possible for an arbitrary light ray, we will enact total internal reflection, however, this check
+boils down to a simple determinant (<code>1 - eta**2(1 - cos^2(theta))</code>) sign check from Snell's law. Since we assume
+light is traversing between air and some material with index of refraction <code>ior</code>, for a given light ray, we can query
+the dot product between the light ray and the intersect surface normal, where a positive dot product implies the light ray traverses through
+air into the material (<code>eta = 1 / ior </code>) and a negative dot product implies the light ray traverses through the material into
+air (<code>eta = ior </code>).
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+With 2 light ray bounces, we start to see the true nature of the materials. We can clearly see that the mirror sphere does
+reflect its surroundings. Sort of. Notice the ceiling appears to be black, as does the floor. Intuitively, this is logical
+since with only 2 light bounces, the ceiling itself is only illuminated when light reflects from objects like the floor
+or walls back to the ceiling itself. Thus if we shoot a camera ray into the scene, which then hits the mirror ball,
+and happens to bounce to the ceiling, with only one light bounce left, we have no chance of reaching a light, before exhausting our light bounce limit, thus
+the ceiling's reflection would in fact appear black. With the glass sphere we get this smoky glass appearance, which is
+incorrect, albeit interesting to look at. If we think about how the glass sphere is treating incoming rays of light
+based on our probabilistic reflection vs. refraction model, hinging on Schlick's approximation, the camera ray
+will either reflect or refract. If we reflect, we either hit the walls, or floor, then hit a light, which results
+in the vague semblances of the Cornell box we can see in the glass sphere, or we refract. If we refract,
+the next light bounce will hit the exiting point of the sphere, thus again, we fail to really reach the light before exhausting our light bounce limit,
+resulting in this odd occluded appearance to our sphere.
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+3 light bounces is where many of these issues start to be cleaned up. The chrome mirror ball now correctly reflects
+the lit ceiling and floor since from the intersection of the cast ray and the chrome ball, the light can now bounce
+to the ceiling, to another actor in the scene (the wall for example) then to the light. In other words, a complete path
+from the mirror to the ceiling to the light can now be formed. A subtle new change is we can start to see the transparent
+nature of the glass sphere in the reflection in the chrome sphere. It isn't quite right, since with only 3 bounces, we won't
+be able to capture the full refraction back to the light. The glass sphere also looks much better. The first obvious improvement
+is in the sphere itself. With 3 light bounces, a camera ray can successfully either reflect, or refract through the glass
+to the environment, to the light. This allows for much more realistic glass material simulation. Also notice how the light
+focuses under the glass sphere. This is expected since light that passes from the overhead light source would tend to
+refract through the glass, into the focused circle projected onto the ground (Snell's law), and while we start to see this effect with 2 light
+ray bounces, as the refraction itself is cleaned up, so too is the light projection onto the ground.
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/spheres4.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 4)</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/spheres5.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 5)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part1/spheres100.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres (Max Ray Depth: 100)</figcaption>
+      </td>
+      <td>
+        <img src="images/part1/spheres100_rate.png" align="middle" width="500"/>
+        <figcaption align="middle">CBspheres Adaptive Sampling Rate Figure (Max Ray Depth: 100)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div align = "justify">
+<p class = "medium">
+We can combine the analysis of the next 3 images, since we hit the point of diminishing return well before a ray depth of 100.
+With a ray depth of 4, the mirror ball looks very similar. The main difference is in the reflection of the glass sphere in
+the mirror sphere. We can clearly see that the glass sphere looks much more realistic with 4 light bounces. Intuitively,
+giving an extra light bounce means the camera ray can intersect the glass sphere (after bouncing from the mirror sphere),
+refract through the glass, hit the wall on the other side, then intersect the light. In other words, we are adding an additional
+vector of light transport (quite literally) by increasing the number of bounces.
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+As for the glass ball the main interesting new feature is the small patch of focused light on the blue wall. If we think about a
+camera ray cast at this point, in the past, most of the lighting here was probably a result of indirect lighting or direct lighting
+from bouncing to nearby objects, or the light source itself respectively. The difference this time is with 4 light bounces, it has the opportunity
+to intersect the glass ball, and refract through it to the other side. The key is, it can refract again in a direction that would cause
+the outgoing light beam to now travel to the light itself. With 3 bounces, the refractive property of the glass means rays from the light patch exiting the
+sphere would not be likely to intersect the overhead light, preventing additional lighting focus on the wall patch.
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+With 5 and 100 light bounces, the difference is pretty minute. For the most part, the more we let the light bounce, the cleaner
+and more realistic the lighting effects, and thus the material effects will be. We can see the reflections and refractions become less
+granular, as we let light act as it does in real life, bouncing again and again reflecting and refracting until it depletes its energy.
+As a result, the small minute reflections and refractions are captured more accurately with 5 and 100 light bounces, but not such
+that it really justifies the extra computation required. As a side note, we do notice that as a whole, the indirect lighting improves with
+more light bounces, which again can be explained by the same reasoning just applied to diffuse materials instead. Shadows are generally softer
+as light bounces more, reducing the harsh shadow boundaries by lighting them up with indirect light paths.
+</p>
+</div>
+
+
+<br><br>
+
+<h2 align="middle">Section II: Thin Lenses and Depth of Field</h2>
+
+<br>
+
+<div align = "left">
+<p class = "medium">
+<b><i>Pinhole Camera Model vs. Thin Lens Camera Model</i></b>
+</p>
+</div>
+<div align = "justify">
+<p class = "medium">
+From a physical standpoint, the major difference between the pinhole camera model and the thin lens camera model is (predictably)
+the utilization of a lens. A pinhole camera model has an infinitely small "aperture", and one of the consequences of the pinhole camera model is
+the fact that all light rays bouncing off an object will traverse the pinhole, and reflect perfectly across the pinhole. This perfect reflection means
+everything will appear perfectly clear, no blur will be present, and as a consequence, no depth of field will be present either. When we switch over to
+the thin lens model, only if the sensor plane matches the plane where an object focuses across the lens, will the object appear in focus. Practically
+what this implies is given many different objects, at many different depths, it is impossible for all of them to be in focus at once, unlike in the
+pinhole camera model.
+</p>
+</div>
+
+<div align = "justify">
+<p class = "medium">
+The thin lens is mimicked by assuming a discrete aperture size, and an infinitesimally thin lens. Each lens has an inherent focal length, and we know that given
+a set of parallel rays from an object in our environment, if they traverse the thin lens, they will cross the focus. Where these parallel rays converge, we define
+the plane of focus, as if we move our virtual sensor to this position, the object will be in focus. How do we simulate this programmatically? Let's consider some point
+in our scene. For every point and lens, we have a well defined <b>chief ray</b>, the ray from the point that will cross the lens center. Since we can't computationally
+generate every ray from a point through the lens, instead, we will take a random sample of a point on our thin lens. From this point, we know it will cross the chief ray
+at the plane of focus, thus by generating a ray from the lens sample to the plane of focus, we can define a random ray that crosses our thin lens. The link
+between the intersection of the sampled and chief ray and the sensor position thus allow us to define the circle of confusion, where we know the circle of confusion's diameter
+<code>C = A * abs(Zs - Zi) / Zi</code> where <code>A</code> is the aperture diameter, <code>Zs</code> is the distance between the lens and the sensor location, and <code>Zi</code> is the distance
+between the plane of focus and the lens. As a result, we can illustrate some really cool depth of field effects.
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part2/CBdragon_focus_1.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (Near Focus)</figcaption>
+      </td>
+      <td>
+        <img src="images/part2/CBdragon_focus_2.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (Mid Focus)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part2/CBdragon_focus_3.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (Far Focus)</figcaption>
+      </td>
+      <td>
+        <img src="images/part2/CBdragon_focus_4.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (Super Far Focus)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+
+<div align = "left">
+<p class = "medium">
+<b><i>Aperture Size</i></b>
+</p>
+</div>
+<div align = "justify">
+<p class = "medium">
+What happens when we alter the size of the aperture? We can see from the circle of confusion formula above that increasing the aperture size results in an increased
+circle of confusion. Practically, this means images with out-of-focus objects will look blurrier, and indeed we see exactly this below. Intuitively, having a larger
+lens area to sample implies a larger variance, and thus larger expected angle between two sampled rays, which inherently increases the diameter of the circle of confusion inevitably.
+</p>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part2/CBdragon_apt15.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (15mm Aperture)</figcaption>
+      </td>
+      <td>
+        <img src="images/part2/CBdragon_apt35.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (35mm Aperture)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part2/CBdragon_apt65.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (65mm Aperture)</figcaption>
+      </td>
+      <td>
+        <img src="images/part2/CBdragon_apt90.png" align="middle" width="500"/>
+        <figcaption align="middle">CBdragon (90mm Aperture)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
 </body>
 </html>
