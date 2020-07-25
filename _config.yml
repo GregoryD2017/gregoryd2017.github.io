@@ -35,7 +35,7 @@ subtitle: Portfolio + Homepage
 description: >- # this means to ignore newlines until "baseurl:"
   Hello, I'm Gregory, welcome to my website.
   Feel free to take a look around!
-  
+
 author: Gregory Du
 email: 17GregoryD@gmail.com
 avatar: assets/images/avatar.jpg
@@ -50,7 +50,7 @@ twitter_url:
 facebook_url:
 googleplus_url:
 instagram_url:
-linkedin_url:
+linkedin_url: https://www.linkedin.com/in/gregory-du-06a875158/
 github_url: https://github.com/GregoryD2017
 stackoverflow_url:
 pinterest_url:
