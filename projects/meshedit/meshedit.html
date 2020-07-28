@@ -9,7 +9,8 @@ hide: true
     max-width: 100%;
     height: auto;
     width: auto\9;
-    align: middle;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   p.medium {line-height : 1.5;}
@@ -22,7 +23,7 @@ hide: true
 </head>
 <body>
 
-<img src="images/intro/header.PNG" align="middle" width="800px"/>
+<img src="images/intro/header.PNG" width="800px"/>
 
 <h2 align="middle">Overview</h2>
 <p class = "medium">
@@ -232,13 +233,11 @@ diagram for clarity):
 
 
 <div align = "left">
-<code>
 <ol>
 <li>Get the position of y (y_pos = h->twin()->vertex()->position) </li>
 <li>Get the position of z (z_pos = h->next()->next()->vertex()->position)</li>
 <li>Take half their cross product (0.5 * cross(y_pos, z_pos))</li>
 </ol>
-</code>
 </div>
 
 <div align = "justify">
@@ -247,8 +246,6 @@ Then all we need to do is return TVS / TA.
 </p>
 </div>
 
-
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -264,8 +261,6 @@ Then all we need to do is return TVS / TA.
   </table>
 </div>
 
-<br>
-
 
 <h3 align="middle">Part 4: Half-edge flip</h3>
 
@@ -279,7 +274,6 @@ as a result. As per the guide, we element assign <b>every</b> half edge, vertex,
 starting state.
 </p>
 </div>
-
 
 <br>
 <div align = "middle">
@@ -693,8 +687,6 @@ initial triangulation is symmetric, any additional vertices will be symmetricall
 <b><i>Boundaries:</i></b>
 </p>
 </div>
-
-
 <div align = "justify">
 <p class = "medium">
 Boundaries are weird. Supposedly I should be able to iterate through all starter vertices, and if I find a boundary vertex, I need to reweight this
@@ -738,8 +730,6 @@ this part out, they all point to this same weighting scheme. On the bright side,
 </p>
 </div>
 
-
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
