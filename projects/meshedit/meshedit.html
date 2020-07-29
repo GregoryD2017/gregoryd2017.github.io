@@ -78,7 +78,6 @@ degree control points.
     </tr>
   </table>
 </div>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -93,7 +92,6 @@ degree control points.
     </tr>
   </table>
 </div>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -527,8 +525,6 @@ For many meshes, subdivision smoothes the low-poly appearance of a model, which 
 becomes more granular, and the model appears to be higher quality (see the teapot comparison above).
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -545,7 +541,6 @@ becomes more granular, and the model appears to be higher quality (see the teapo
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 Unfortunately, edges and corners don’t hold up well under loop subdivision. As we subdivide the mesh, if we observe the way the loop subdivision
@@ -554,8 +549,6 @@ and reweight our starter vertices similarly. As a result, sharp mesh elements, l
 as they regress to the vertices neighboring them.
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -572,7 +565,6 @@ as they regress to the vertices neighboring them.
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 We can temper this effect a bit, by pre-splitting some edges, although this is far from the sharpness that would be acceptable for creasing.
@@ -580,17 +572,12 @@ Observe in the torus below, we pre-split some of the edges on one side of the do
 is apparent, considerably more so than without preprocessing.
 </p>
 </div>
-
-
 <br>
-
 <div align = "left">
 <p class = "medium">
 <b><i>Asymmetric Upsampling:</i></b>
 </p>
 </div>
-
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -614,8 +601,6 @@ underlying geometry triangulation splits each face along only one diagonal? The 
 triangles will be oriented exactly as the starter triangles were.
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -632,7 +617,6 @@ triangles will be oriented exactly as the starter triangles were.
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 The intuition becomes starkly apparent when we compare the subdivision right before the reweighting of our asymmetric triangulation
@@ -642,8 +626,6 @@ combinations of the vertices will necessarily mirror this orientation. Put anoth
 asymmetry in the first subdivision, which in turn leads to asymmetry in the second subdivision ad infinitum.
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -660,17 +642,13 @@ asymmetry in the first subdivision, which in turn leads to asymmetry in the seco
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 We can fix this issue by splitting every diagonal edge first, thereby imposing a symmetric distribution of vertices. Essentially now, since the
 initial triangulation is symmetric, any additional vertices will be symmetrically added, and symmetrically reweighted as well.
 </p>
 </div>
-
-
 <br>
-
 <div align = "left">
 <p class = "medium">
 <b><i>Boundaries:</i></b>
@@ -683,7 +661,6 @@ vertex such that it has position: (1/8) * A + (3/4) * B + (1/8) * C. Then for al
 the original edge at the center. Did this work?
 </p>
 </div>
-
 
 <br>
 <div align = "middle">
@@ -701,7 +678,6 @@ the original edge at the center. Did this work?
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 Kind of... we can see that this new scheme certainly doesn’t ignore boundary elements, but it looks a little odd. There seems to be noise in the
@@ -718,7 +694,6 @@ this part out, they all point to this same weighting scheme. On the bright side,
 <b><i>Triadic Subdivision:</i></b>
 </p>
 </div>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -733,8 +708,6 @@ this part out, they all point to this same weighting scheme. On the bright side,
     </tr>
   </table>
 </div>
-<br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -750,7 +723,6 @@ this part out, they all point to this same weighting scheme. On the bright side,
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 This is an interesting alternate subdivision mode. The basis for this mode of upsampling is as follows: first, we will precalculate (as in loop

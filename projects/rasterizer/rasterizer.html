@@ -4,16 +4,29 @@ layout: page
 hide: true
 ---
 
-<<!DOCTYPE html>
+<!DOCTYPE html>
+<style>
+  img {
+    margin: auto;
+    display: block;
+    max-width: 99%;
+    height: auto;
+    width: auto\9;
+  }
+
+  p.medium {line-height : 1.5;}
+</style>
+
 <html lang="en" dir="ltr">
-<head>
-<meta charset="utf-8">
-</head>
+  <head>
+    <meta charset="utf-8">
+  </head>
+
 <body>
 
 <br>
 <div align="middle">
-    <img src="images/misc/initial.png" align="middle" width="800px"/>
+    <img src="images/misc/initial.png" align="middle" width="600px"/>
     <figcaption align="middle">Texture Mapped Render</figcaption>
 </div>
 <br>
@@ -26,44 +39,32 @@ the rasterizer first parses input data regarding points, lines, and triangles fr
 the rasterizer is able to determine exactly which pixels should be colored on the screen (and what color they should be) in order to accurately reflect the input data.
 Numerous other features have been implemented as well, including antialiasing to improve the visual quality of the rendered images by smoothing jagged lines,
 SVG transformations, barycentric coordinate interpolation for color blending and rapid triangle in-testing, and various level sampling and pixel sampling
-methods to support texture mapping. A detailed walkthrough of each part will be provided below. Note: all extra credit features need to be toggled on/off with their respective boolean flags in
-the rasterizer and texture source code files.</p>
-
-<br>
+methods to support texture mapping. A detailed walkthrough of each part will be provided below..</p>
 <br>
 
 <h2 align="left">Section I: Rasterization</h2>
-
-
 <h3 align="left">Part 1: Rasterizing single-color triangles</h3>
-	  <p><b>How are Triangles Rasterized?</b><br>
-      At its core, triangle rasterization revolves around determining how to draw a triangle in abstract 3D space onto a screen of pixels (called screen space).
-	  While it isn't a perfect analogy, a screen can be thought of as a rectangular collection of a bunch of tiny squares called pixels. Triangle rasterization then reduces to
-	  determining what pixels need to be colored in to accurately draw the triangle on the screen. In other words, we need to determine what pixels
-	  fall within each triangle, since these are the pixels we want to color in on the screen. Given that we know the location of the triangle on the screen,
-	  how do we determine whether some pixel <i>p</i> is within the triangle we are trying to rasterize? We can perform a simple triangle in-test!</p>
-
-	  <p>For each edge of the triangle, let's extend the line casted by the edge, and starting at an arbitrary vertex, we can choose a winding order. Given the winding order,
-	  at each vertex, we can draw a vector perpendicular to the edge-line defined by the current vertex and the next vertex in the
-	  winding order. Starting again from the first vertex in the winding order, at each vertex, draw a vector stemming from the current vertex that passes through
-	  <i>p</i>. Now simply take the dot product of this vector and the perpendicular vector previously defined at this vertex,
-	  and repeat for each of the vertices in the order specified by the winding order. Provided the signs of the dot products are all the same, the point is in the triangle!
-	  Otherwise, the point lies outside the triangle.</p>
-
-	  <p>Given a specific color, any pixel that is found to be in the triangle is marked with the specified color. Other pixels are left white. This process is then repeated
-	  for every pixel in the bounding box of the triangle, defined as the smallest rectangle that fully encloses the triangle.</p>
-
-	<br>
-	<br>
-
-	<div align="middle">
-        <img src="images/part1/basic4.png" align="middle" width="600px"/>
-        <figcaption align="middle">Test4 rasterized. Note the disconnected jaggedness arising from aliasing.</figcaption>
-	</div>
-
-	<br>
-	<br>
-
+<br>
+<p><b>How are Triangles Rasterized?</b><br>
+At its core, triangle rasterization revolves around determining how to draw a triangle in abstract 3D space onto a screen of pixels (called screen space).
+While it isn't a perfect analogy, a screen can be thought of as a rectangular collection of a bunch of tiny squares called pixels. Triangle rasterization then reduces to
+determining what pixels need to be colored in to accurately draw the triangle on the screen. In other words, we need to determine what pixels
+fall within each triangle, since these are the pixels we want to color in on the screen. Given that we know the location of the triangle on the screen,
+how do we determine whether some pixel <i>p</i> is within the triangle we are trying to rasterize? We can perform a simple triangle in-test!</p>
+<p>For each edge of the triangle, let's extend the line casted by the edge, and starting at an arbitrary vertex, we can choose a winding order. Given the winding order,
+at each vertex, we can draw a vector perpendicular to the edge-line defined by the current vertex and the next vertex in the
+winding order. Starting again from the first vertex in the winding order, at each vertex, draw a vector stemming from the current vertex that passes through
+<i>p</i>. Now simply take the dot product of this vector and the perpendicular vector previously defined at this vertex,
+and repeat for each of the vertices in the order specified by the winding order. Provided the signs of the dot products are all the same, the point is in the triangle!
+Otherwise, the point lies outside the triangle.</p>
+<p>Given a specific color, any pixel that is found to be in the triangle is marked with the specified color. Other pixels are left white. This process is then repeated
+for every pixel in the bounding box of the triangle, defined as the smallest rectangle that fully encloses the triangle.</p>
+<br>
+<div align="middle">
+    <img src="images/part1/basic4.png" align="middle" width="600px"/>
+    <figcaption align="middle">Test4 rasterized. Note the disconnected jaggedness arising from aliasing.</figcaption>
+</div>
+<br>
 <p><b>Algorithmic Performance</b><br>
     My naive algorithm is no worse than one which checks each sample in the bounding box of the triangle, because that is precisely what it does. It calculates
 	  the minimum <i>x</i> and minimum <i>y</i> coordinates, xMin and yMin, of the triangle it is rasterizing, as well as the maximum coordinates in both dimensions
@@ -147,28 +148,24 @@ the rasterizer and texture source code files.</p>
 		</tr>
 		</table>
 </div>
-
-<br>
 <br>
 
 <h3 align="left">Part 2: Antialiasing triangles</h3>
-<p><b>Antialiasing through supersampling</p></b>
+<br>
+<p><b>Antialiasing through supersampling</b>
 Conceptually, supersampling mimics the effect of sequentially applying a box filter to the frequency domain of an image. The algorithm requires only a simple modification
 of the simple triangle rasterization algorithm. Just like before, we will only consider pixels within the triangles bounding box to speed up computation. Given a perfect-square
 supersampling rate, we know we will need to take <code>sample_rate</code> samples per pixel, instead of just one. For simplicity's sake, we can assume the supersamples will form
 a perfect grid within the pixel, meaning we will essentially have <code>sqrt(sample_rate)</code> rows of samples, and <code>sqrt(sample_rate)</code> columns of samples. For each supersample
 we perform the same triangle in-test as described above. We then store the color data for every supersample for every pixel in a vector of supersamples. This means in all, our supersamples
-vector will have <code>length * width * sample_rate</code> color values, where the length and width variables refer simply to the resolution dimensions of the image.
+vector will have <code>length * width * sample_rate</code> color values, where the length and width variables refer simply to the resolution dimensions of the image.</p>
 
 <p>This seems nice, but unfortunately, we are left with a problem. The resolution at which we just sampled is much too high! Our screen has limited resolution, so we
 can't arbitrarily increase the size of our frame buffer. Thus we now must downsample. For each genuine pixel in the framebuffer, where a genuine pixel is one which actually
 exists on the screen, we average the color of all of its supersamples by pulling the supersampled colors from the supersamples vector defined earlier. Each pixel's red, green
 and blue values are written sequentially in the frame buffer, an unsigned character array, then the pixels are rendered from the frame buffer onto the screen.
 The result? A much smoother image, without the jagged lines (jaggies) we saw before.</p>
-
 <br>
-<br>
-
 <div align="middle">
   <table style="width=100%">
     <tr>
@@ -193,20 +190,14 @@ The result? A much smoother image, without the jagged lines (jaggies) we saw bef
     </tr>
   </table>
 </div>
-
 <br>
-<br>
-
 <p>Take a look at this comparison of the same image supersampled with sample rates 1 (no supersampling), 4, 9, and 16. Notice how the edge blurs together, removing the harsh
 triangle disconnect observed with sample rate 1? When we don't super sample, if the triangle is very thin, and we sample the pixel in a place that just so happens to be outside
 the thin part of our triangle, our algorithm treats it as if there was nothing there! As we take more supersamples, our chances of not hitting any of the triangle decreases.
 Intuitively, when we average the colors of all of our supersamples, we are calculating the intensity of the color displayed as a function of the coverage of the pixel by
 the triangle. Since the pixel is partially covered by the triangle, we see that the color is partially saturated to indicate at least part of the triangle is covering the pixel,
 which eliminates the stark all or nothing coloring scheme with only one sample per pixel. In general, all edges will appear smoother as we up the sample rate.</p>
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part2/basic_16.png" align="middle" width="600px"/>
     <figcaption align="middle">Grid Supersampling (16x sample rate)</figcaption>
@@ -214,76 +205,39 @@ which eliminates the stark all or nothing coloring scheme with only one sample p
     <img src="images/part2/jitter_16.png" align="middle" width="600px"/>
     <figcaption align="middle">Jittered Supersampling (16x sample rate)</figcaption>
 </div>
-
 <br>
-<br>
-
-<p><b>Extra Credit: Jittered Sampling</b>
+<p><b>Alternate Scheme: Jittered Sampling</b>
 To defeat the regularity of supersampling which can often times lead to predictable rendering artifacts, I also implemented jittered sampling for antialiasing. It actually builds upon
 regular supersampling quite well. The only difference is that instead of taking each supersample at a perfect equivalent interval, such that all supersamples are evenly
 spaced, instead, jittered sampling first cuts the pixel into n rows and n columns, where n is simply the square root of the sample rate. Then in each of these new sub-cuts of the pixel, we randomly
 determine the position of the sample. Notice how while grid supersampling leaves a disconnected pixel at the top, even at 16 supersamples per pixel, jittered supersampling does not.
 (Random position seed: 22)</p>
-
 <br>
 <br>
-
-<h3 align="left">Part 3: Transforms</h3>
-
-<br>
-<br>
-
-	<div align="middle">
-        <img src="images/part3/robot_charge.png" align="middle" width="600px"/>
-        <figcaption align="middle">Cubeman is charging his power</figcaption>
-	</div>
-
-<br>
-<br>
-
-<p>Cubeman is pretty cool, but we can make him cooler. Cubeman is now charging his power, in an homage to Dragonball Z. Is he powering up for an attack? Is he transforming?
-Your guess is as good as mine. Feel free to watch scenes of Dragon Ball Z characters powering up to see what I was trying to go for. If you know, you know.</p><br>
-
-<br>
-<br>
-
 <h2 align="left">Section II: Sampling</h2>
 
 <h3 align="left">Part 4: Barycentric coordinates</h3>
-
 <br>
-<br>
-
 	<div align="middle">
         <img src="images/part4/barycentric.png" align="middle" width="600px"/>
         <figcaption align="middle">Physical intepretation of barycentric coordinates. Note how the point is closest to the vertex with the greatest weight.</figcaption>
 	</div>
-
 <br>
-<br>
-
-<p><b>What are Barycentric Coordinates?</p></b><br>
+<p><b>What are Barycentric Coordinates?</b>
 <p>Barycentric coordinates are a little weird to understand. The best analogy and explanation I have heard, which really makes sense to me, is that barycentric coordinates
 in a triangle refer to the weight each triangle vertex has on the point in question. In other words, the point in question was created by combining weighted versions of all 3 vertices
 of the triangle, and these weights themselves are the barycentric coordinates. The weights are like a measure of the pull each vertex has on the point in question.
 This also helps explain why barycentric coordinates sum to 1. Intuitively, all the weights together make up the one point, thus the weights combined should equal 1.
 The above diagram interprets weights to mean literal weights, but the weights can refer to any blendable quantity (color, position, etc.).</p>
-
 <br>
-<br>
-
 	<div align="middle">
         <img src="images/part4/test7.png" align="middle" width="600px"/>
         <figcaption align="middle">Barycentric Coordinate Color Interpolation</figcaption>
 	</div>
-
 <br>
-<br>
-
-
 <h3 align="left">Part 5: "Pixel sampling" for texture mapping</h3>
 
-<p><b>What is Pixel Sampling?</b></p>
+<p><b>What is Pixel Sampling?</b>
 <p>Fundamentally pixel sampling is simply the act of mapping datum from a source to your image. In our case, the data comes in the form of a texture image, which we
 map to our screen by sampling. Simple enough, but what exactly does it mean to sample the texture? The first important point to understand
 is that while screen coordinates use the traditional X,Y coordinate frame, textures use the U,V coordinate frame. With that in mind, I'll describe two methods of texture sampling.</p>
@@ -301,10 +255,7 @@ We can intuitively think about <i>s</i> and <i>t</i> as how strongly our sampled
 blend the bottom left and bottom right texel colors by linearly interpolating them with weight <i>s</i>, and we can do the same for the top left and top right texels.
 Now, all we have to do is blend the blended bottom color and the blended top color by linearly interpolating them with weight <i>t</i>, and voila, the sampled color for our screen space pixel.
 A little bit more work, but bilinear sampling tends to look smoother than nearest pixel sampling. </p>
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part5/nearest_1.png" align="middle" width="600px"/>
     <figcaption align="middle">Nearest Pixel Sampling (1x sample rate)</figcaption>
@@ -312,43 +263,30 @@ A little bit more work, but bilinear sampling tends to look smoother than neares
 	<img src="images/part5/bilinear_1.png" align="middle" width="600px"/>
     <figcaption align="middle">Bilinear Pixel Sampling (1x sample rate)</figcaption>
 </div>
-
 <br>
-<br>
-
 <p>At a sample rate of 1, the difference is stark. Bilinear sampling does a great job accounting for the surrounding pixels in the blended Berkeley logo. Due to the compact
 and rapid alterations in the texture, nearest pixel sampling fails to capture the smooth transitions of the texture, leaving harsh lines and pixel marks.</p>
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part5/nearest_16.png" align="middle" width="600px"/>
     <figcaption align="middle">Nearest Pixel Sampling (16x sample rate)</figcaption>
 	<br>
     <img src="images/part5/bilinear_16.png" align="middle" width="600px"/>
     <figcaption align="middle">Bilinear Pixel Sampling (16x sample rate)</figcaption>
-
 </div>
-
 <br>
-<br>
-
 <p>At a sample rate of 16, the difference is less noticeable. As we increase the number of samples, nearest sampling starts to get better at blending together the colors of
 surrounding pixels, allowing for it to capture the alterations in the texture much more effectively. Still, bilinear sampling does a better job, as it benefits from
 both the effects of a higher sampling rate, as well as the physical blending of nearby pixel colors.</p>
-
-
 <p>So in general, when will we see a big difference in nearest pixel sampling and bilinear pixel sampling? Usually this happens when the texture is very granular, and when the sample rate is low. In other words,
 the texture's signal changes too quickly, and nearest pixel sampling is unable to capture the change quickly enough (aliasing) due to the fact that it takes only the
 nearest texel, and completely disregards the texels surrounding it. This is very similar to the issue we saw with the all or nothing single sample per pixel in part 1.</p>
-
 <br>
 <br>
 
 <h3 align="left">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
 
-<p><b>What is Level Sampling?</b></p>
+<b>What is Level Sampling?</b><br>
 <p>While level sampling may sound similar to pixel sampling, they tune different attributes of the sampling process. Sometimes, when we are trying to texture map a scene, we come across a problem.
 Different parts of our scene need different levels of detail. For instance, something right in front of us should be much more detailed than an object 2 miles in the background.
 If we use the same level of detail for both the object in the foreground and the object in the background, either the object in the foreground won't have enough detail, or we
@@ -374,10 +312,7 @@ is simply the continuous section of the miplevel. This entire process is known a
 <p>It's pretty crazy to think through the entire process, but what is even more difficult to fully comprehend is the fact that this is a per-pixel operation. It is likely
 we will have to do this for millions of pixels! Luckily, GPU architecture works a gem and keeps render times low. Of course, increased visual fidelity is not free. Let's think through all
 the possible combinations of pixel sampling and level sampling.</p>
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part6/zero_nearest.png" align="middle" width="600px"/>
     <figcaption align="middle">Zero level, nearest pixel sampling</figcaption>
@@ -385,12 +320,8 @@ the possible combinations of pixel sampling and level sampling.</p>
     <img src="images/part6/zero_bilinear.png" align="middle" width="600px"/>
     <figcaption align="middle">Zero level, bilinear pixel sampling</figcaption>
 </div>
-
 <br>
-<br>
-
-
-<p><i>0th level sampling</i></p>
+<i>0th level sampling</i><br>
 <p>The lowest cost mode is nearest pixel sampling with 0th level sampling. You need to store only the full resolution texture and no other miplevels, so this requires the least memory.
 Speed wise, this it the fastest as well since this involves no LERPing of colors, saving on computation time.
 This looks fine when you're zoomed in, but as you zoom out, you'll start to notice just how poorly aliasing makes the render look. You aren't accounting for the surrounding texels
@@ -400,11 +331,7 @@ so your render will likely be sampled too much in some parts, and not enough in 
 since we are accounting for surrounding texels in our sampling scheme and blending colors to help with the sharp color differentials. But whenever we don't use altering miplevels,
 we always sample from one resolution, thus as you zoom in and out, the size and staging of the image changes, but the resolution of the texture doesn't. When you zoom far out,
 you're unable to blur the image sufficiently to remove aliasing. Of course bilinear interpolation also takes more compute time, since you will need to compute 3 lerps per sample.</p>
-
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part6/nearest_nearest.png" align="middle" width="600px"/>
     <figcaption align="middle">Nearest level, nearest pixel sampling</figcaption>
@@ -412,11 +339,8 @@ you're unable to blur the image sufficiently to remove aliasing. Of course bilin
     <img src="images/part6/nearest_bilinear.png" align="middle" width="600px"/>
     <figcaption align="middle">Nearest level, bilinear pixel sampling</figcaption>
 </div>
-
 <br>
-<br>
-
-<p><i>Nearest level sampling</i></p>
+<i>Nearest level sampling</i><br>
 <p>Let's say we bump up to using nearest level sampling. If we use nearest pixel sampling as well, this isn't too bad. Memory wise however, we need to store all the miplevels we could
 possibly need, so this increases our memory usage. Speed wise, this isn't too horrible. We do need to compute the miplevel every time, but once we know the miplevel, since we are only
 sampling the nearest pixel, the retrieval of the texel color is relatively fast. As with all nearest pixel sampling schemes, the danger with this combination is the lack of awareness
@@ -428,24 +352,16 @@ we don't need any more memory (in fact, our memory usage will be the same for th
 on top of that, we also need to LERP 3 colors as part of our bilinear pixel sampling scheme. As a benefit, this method will be better at capturing granular texture details, and dealing with dynamic staging as it has the awareness
 of surrounding texels that the previous method lacks. Both of the nearest level sampling methods are good in their ability to adapt their detail depending on the zoom level. As we
 zoom further out, our algorithm realizes the detail needs to be less granular, in fact blurring will look better, thus it samples from a lower miplevel. The opposite occurs as we zoom in.</p>
-
-
 <br>
-<br>
-
 <div align="middle">
-
     <img src="images/part6/bilinear_nearest.png" align="middle" width="600px"/>
     <figcaption align="middle">Bilinear level, nearest pixel sampling</figcaption>
 	<br>
     <img src="images/part6/trilinear.png" align="middle" width="600px"/>
     <figcaption align="middle">Bilinear level, bilinear pixel sampling (trilinear filtering)</figcaption>
 </div>
-
 <br>
-<br>
-
-<p><i>Linear level sampling</i></p>
+<i>Linear level sampling</i><br>
 <p>Now what if we use linear level sampling? If we use nearest pixel sampling, all the problems we previously described with nearest pixel sampling still exist.
 This algorithm takes a bit longer than nearest level nearest pixel sampling since we need to query 2 texels, and lerp their colors, but this is relatively not as bad as the cost
 bilinear interpolation would incur. Our renders benefit since we are now accounting for the continuity inherent to miplevel calculation. As we might expect, this helps to smooth out the image
@@ -457,38 +373,24 @@ As we zoom in and out, this will draw the smoothest details (although not the fi
 but also account for surrounding texels of granular textures. Trilinear filtering is pretty amazing as a concept. If you play games, trilinear filtering helps to smooth things out, but you may notice
 overblur. This tends to happen when antialiasing works a bit too much. You'll also notice that it taxes your GPU more. This is to be expected given all of the extra calculations
 that need to be performed.</p>
-
 <br>
-<br>
-
 	<div align="middle">
         <img src="images/part6/supersampled.png" align="middle" width="600px"/>
         <figcaption align="middle">Supersampled (16x sample rate).</figcaption>
 	</div>
-
 <br>
-<br>
-
-
 <p>Why not just supersample the texture? It's certainly an option, and as we see above, it actually produces cleaner and crisper results than mipmapping does. The drawback?
 It's abysmally expensive computation wise. Unfortunately, the prospect of taking 16 supersamples while texturing simply takes too much compute power to make this a feasible
 method of texture mapping, especially in the case of real time rendering. It requires the same amount of space as regular supersampling would, thus it is not particularly
 expensive in space complexity.</p>
-
 <br>
-<br>
-
 	<div align="middle">
         <img src="images/part6/anisotropic.png" align="middle" width="600px"/>
         <figcaption align="middle">Anisotropic Filtering with SMAT</figcaption>
 	</div>
-
 <br>
-<br>
-
-
-<p><b>Extra Credit: Anisotropic Filtering</b>
-I've implemented anistropic filtering through the summed area tables method illustrated in Frank Crow's 1984 SIGGRAPH paper. The essence of Crow's method of anisotropic filtering is using
+<b>Extension: Anisotropic Filtering</b><br>
+<p>I've implemented anistropic filtering through the summed area tables method illustrated in Frank Crow's 1984 SIGGRAPH paper. The essence of Crow's method of anisotropic filtering is using
 a summed area table (SMAT) in order to allow for visual acuity even with irregular axis and perspective orientation. It has been noted MipMaps suffer from overblur, which is distinctly
 noticeable when the image's perspective causes non-parallel viewing axes. The summed area table data structure is a 2D vector of colors, where the color at position x, y
 is equal to the sum of the colors below and to the left of texel (x, y), rooted at texel (0,0).</p>
@@ -500,11 +402,7 @@ are the upper right, upper left, lower right, and lower left texels of the pixel
 <p>The key, and the beauty of anistropic filtering is <i>the bounding rectangle</i>, which eschews mirrored compression in all axes, allowing sampling at different frequencies
 on different axes, depending on the general direction of the texture's compression. NOTE: There are definitely bugs in the implementation. Note as one example the artifact in the map's lower right corner.
 Nevertheless, it's really interesting to see how anistropic filtering has started to fix the overblur of trilinear filtering.</p>
-
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part6/comet_trilinear.png" align="middle" width="600px"/>
     <figcaption align="middle">Trilinear Filtering</figcaption>
@@ -512,16 +410,10 @@ Nevertheless, it's really interesting to see how anistropic filtering has starte
     <img src="images/part6/comet_anisotropic.png" align="middle" width="600px"/>
     <figcaption align="middle">Anisotropic Filtering with SMAT</figcaption>
 </div>
-
 <br>
-<br>
-
 <p>The biggest differences are seen in the smoother textures near the edges, where the texture compression is most irregular. Note the smoothness of the light trails
 in the anisotropic render and most importantly, the clarity of the light, as opposed to the overblur of trilinear filtering.</p>
-
 <br>
-<br>
-
 <div align="middle">
     <img src="images/part6/map_trilinear.png" align="middle" width="600px"/>
     <figcaption align="middle">Trilinear Filtering</figcaption>
@@ -529,10 +421,7 @@ in the anisotropic render and most importantly, the clarity of the light, as opp
     <img src="images/part6/map_anisotropic.png" align="middle" width="600px"/>
     <figcaption align="middle">Anisotropic Filtering with SMAT</figcaption>
 </div>
-
 <br>
-<br>
-
 <p>The difference is brought into even greater contrast here. Notice how overblurred the map is under trilinear filtering as opposed to the clarity of anisotropic filtering.</p>
 </body>
 </html>
