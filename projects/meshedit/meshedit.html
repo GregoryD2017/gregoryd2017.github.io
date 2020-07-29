@@ -3,8 +3,6 @@ title: Meshedit
 layout: page
 hide: true
 ---
-{%- assign _posts = site.posts | sort: 'date' | reverse -%}
-{%- include header.html scrolly_nav=_posts -%}
 
 <style>
   img {
@@ -26,6 +24,7 @@ hide: true
 <body>
 
 <img src="images/intro/header.PNG"/>
+<br>
 
 <h2 align="middle">Overview</h2>
 <p class = "medium">
@@ -64,7 +63,6 @@ degree control points.
 </p>
 </div>
 
-<br>
 
 <div align = "middle">
   <table style="width=100%">
@@ -111,7 +109,6 @@ degree control points.
   </table>
 </div>
 
-<br>
 
 <div align = "justify">
 <p class = "medium">
@@ -120,7 +117,6 @@ parameter <var>t</var>, which helps to visualize the entire Bezier curve.
 </p>
 </div>
 
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -135,7 +131,6 @@ parameter <var>t</var>, which helps to visualize the entire Bezier curve.
     </tr>
   </table>
 </div>
-
 <br>
 
 
@@ -438,11 +433,9 @@ triangle in two, by dividing the midpoint of the boundary edge with a vertex, an
 </p>
 </div>
 
-<br>
 
 <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
 
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -465,8 +458,6 @@ triangle in two, by dividing the midpoint of the boundary edge with a vertex, an
 <b><i>Loop Subdivision: A Walkthrough:</i></b>
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
 <img src="images/part6/weighting_walkthrough.png" align="middle" width="800px"/>
@@ -525,15 +516,11 @@ equal to their <code>newPosition</code> field!
 </div>
 
 
-<br>
-
 <div align = "left">
 <p class = "medium">
 <b><i>Upsample Dulling, or The Problem With Edges and Corners:</i></b>
 </p>
 </div>
-
-
 <div align = "justify">
 <p class = "medium">
 For many meshes, subdivision smoothes the low-poly appearance of a model, which stands to reason. Features become more detailed as the mesh
