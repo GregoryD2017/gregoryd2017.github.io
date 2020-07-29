@@ -38,8 +38,8 @@ hide: true
 the rasterizer first parses input data regarding points, lines, and triangles from the provided SVG. Through a series of triangle in-tests,
 the rasterizer is able to determine exactly which pixels should be colored on the screen (and what color they should be) in order to accurately reflect the input data.
 Numerous other features have been implemented as well, including antialiasing to improve the visual quality of the rendered images by smoothing jagged lines,
-SVG transformations, barycentric coordinate interpolation for color blending and rapid triangle in-testing, and various level sampling and pixel sampling
-methods to support texture mapping. A detailed walkthrough of each part will be provided below..</p>
+barycentric coordinate interpolation for color blending and rapid triangle in-testing, and various level sampling and pixel sampling
+methods to support texture mapping. A detailed walkthrough of each part will be provided below.</p>
 <br>
 
 <h2 align="left">Section I: Rasterization</h2>
@@ -216,7 +216,7 @@ determine the position of the sample. Notice how while grid supersampling leaves
 <br>
 <h2 align="left">Section II: Sampling</h2>
 
-<h3 align="left">Part 4: Barycentric coordinates</h3>
+<h3 align="left">Part 3: Barycentric coordinates</h3>
 <br>
 	<div align="middle">
         <img src="images/part4/barycentric.png" align="middle" width="600px"/>
@@ -235,7 +235,7 @@ The above diagram interprets weights to mean literal weights, but the weights ca
         <figcaption align="middle">Barycentric Coordinate Color Interpolation</figcaption>
 	</div>
 <br>
-<h3 align="left">Part 5: "Pixel sampling" for texture mapping</h3>
+<h3 align="left">Part 4: "Pixel sampling" for texture mapping</h3>
 
 <p><b>What is Pixel Sampling?</b>
 <p>Fundamentally pixel sampling is simply the act of mapping datum from a source to your image. In our case, the data comes in the form of a texture image, which we
@@ -282,9 +282,7 @@ both the effects of a higher sampling rate, as well as the physical blending of 
 the texture's signal changes too quickly, and nearest pixel sampling is unable to capture the change quickly enough (aliasing) due to the fact that it takes only the
 nearest texel, and completely disregards the texels surrounding it. This is very similar to the issue we saw with the all or nothing single sample per pixel in part 1.</p>
 <br>
-<br>
-
-<h3 align="left">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+<h3 align="left">Part 5: "Level sampling" with mipmaps for texture mapping</h3>
 
 <b>What is Level Sampling?</b><br>
 <p>While level sampling may sound similar to pixel sampling, they tune different attributes of the sampling process. Sometimes, when we are trying to texture map a scene, we come across a problem.
