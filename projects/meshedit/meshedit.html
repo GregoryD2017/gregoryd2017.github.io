@@ -23,18 +23,18 @@ hide: true
 </head>
 <body>
 
-<img src="images/intro/header.PNG"/>
+<img src="images/intro/header.PNG" size=600px/>
 <br>
 
-<h2 align="middle">Overview</h2>
+<h2 align="left">Overview</h2>
 <p class = "medium">
 Mesh Editor was an interesting dive into the world of 3D Graphics, and the underlying architecture that enables the geometric manipulations that power tools like Blender, and Maya.
 This project delves into both rendering Bezier curves and Bezier surfaces through a liberal application of <b>de Casteljau's algorithm</b>
 as well as manipulation of triangulated meshes, including edge flipping, edge splitting, and mesh subdivision.
 </p>
 
-<h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
-<h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+<h2 align="left">Section I: Bezier Curves and Surfaces</h2>
+<h3 align="left">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
 
 <br>
 <img src="images/part1/curve3_0.PNG" align="middle" width="800px"/>
@@ -107,7 +107,6 @@ degree control points.
   </table>
 </div>
 
-
 <div align = "justify">
 <p class = "medium">
 We can drag the control points around to see how they will modulate the underlying Bezier curve. Scrolling allows us to alter the linear interpolation
@@ -130,7 +129,6 @@ parameter <var>t</var>, which helps to visualize the entire Bezier curve.
   </table>
 </div>
 <br>
-
 
 <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
 
@@ -168,21 +166,18 @@ each stored as a vector in the Bezier patch, pushing the resulting interpolated 
 </p>
 </div>
 
-
 <br>
 
+<h2 align="left">Section II: Sampling</h2>
 
-<h2 align="middle">Section II: Sampling</h2>
 
-
-<h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
-
+<h3 align="left">Part 3: Average normals for half-edge meshes</h3>
+<br>
 <div align = "justify">
 <p class = "medium">
 Thankfully, the half-edge mesh makes computing area-weighted vertex normals quite elegant. The following pseudocode gives the outline: <br>
 </p>
 </div>
-
 
 <div align = "left">
 <code>
@@ -194,11 +189,8 @@ For each vertex:
 <li>Compute the area of the face.</li>
 <li>Add area to TA</li>
 <li>Add area * face_norm to TVS</li>
-<li>Repeat steps 1-5 for all adjacent faces to the given vertex</li>
-</ol>
-</code>
+<li>Repeat steps 1-5 for all adjacent faces to the given vertex</li></ol></code>
 </div>
-
 
 <div align = "justify">
 <p class = "medium">
@@ -207,25 +199,18 @@ the next face by finding <nobr><code>h->twin()->next()</code></nobr>, and from h
 loop back to <code>h</code>.
 </p>
 </div>
-
-
 <br>
-
 <div align = "middle">
 <img src="images/part3/area.png" align="middle" width="800px"/>
 <figcaption align="middle">Area of Triangulated Face: Iteration Walkthrough</figcaption>
 </div>
-
 <br>
-
-
 <div align = "justify">
 <p class = "medium">
 We can calculate the area of a triangulated face given one vertex on the face by calling on the following routine (please see the accompanying
 diagram for clarity):
 </p>
 </div>
-
 
 <div align = "left">
 <ol>
@@ -257,7 +242,7 @@ Then all we need to do is return TVS / TA.
 </div>
 
 
-<h3 align="middle">Part 4: Half-edge flip</h3>
+<h3 align="left">Part 4: Half-edge flip</h3>
 
 <div align = "justify">
 <p class = "medium">
@@ -269,7 +254,6 @@ as a result. As per the guide, we element assign <b>every</b> half edge, vertex,
 starting state.
 </p>
 </div>
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -286,16 +270,12 @@ starting state.
   </table>
 </div>
 <br>
-
-
 <div align = "justify">
 <p class = "medium">
 This process is really difficult to internalize through text, thus the provided diagram documents the procedure pictorially.
 </p>
 </div>
-
 <br>
-
 <div align = "middle">
 <img src="images/part4/edge_flip.png" align="middle" width="800px"/>
 <figcaption align="middle">Edge Flip Walkthrough</figcaption>
@@ -323,11 +303,10 @@ parameter quickly remedied the issue.
 </div>
 
 
-
-<h3 align="middle">Part 5: Half-edge split</h3>
+<h3 align="left">Part 5: Half-edge split</h3>
 
 <div align = "justify">
-<p class = "medium">
+<p class = "left">
 As with task 4, the implementation of this part is quite straightforward, by following the earlier link. Simply begin by saving pointers for each
 of the half edges, vertices, edges, and faces. This time we will need to create 1 vertex, 3 edges, 2 faces, and 6 half-edges. Then, using the
 diagram I included above, I was able to sequentially assign all neighbors and attributes for every half edge, vertex, edge, and face to account
@@ -335,8 +314,6 @@ for the new central vertex, and the vertices that radiate out from it. It is imp
 midpoint of the edge it cuts.
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -352,9 +329,6 @@ midpoint of the edge it cuts.
     </tr>
   </table>
 </div>
-
-<br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -370,15 +344,12 @@ midpoint of the edge it cuts.
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 Edge splits are perhaps even more tedious to explain in text than edge flips are, so again, the diagram should elucidate the general methodology.
 </p>
 </div>
-
 <br>
-
 <div align = "middle">
 <img src="images/part5/edge_split.png" align="middle" width="800px"/>
 <figcaption align="middle">Edge Split Walkthrough</figcaption>
@@ -405,8 +376,6 @@ Surprisingly, this did not require any debugging. Being super careful in the dia
 worked right after implementation. Lucky.
 </p>
 </div>
-
-
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -423,7 +392,6 @@ worked right after implementation. Lucky.
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 Note the boundary edges split correctly as well. Instead of leaving boundary edges unsplit, I simply split the boundary
@@ -432,7 +400,7 @@ triangle in two, by dividing the midpoint of the boundary edge with a vertex, an
 </div>
 
 
-<h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+<h3 align="left">Part 6: Loop subdivision for mesh upsampling</h3>
 
 <div align = "middle">
   <table style="width=100%">
@@ -448,15 +416,10 @@ triangle in two, by dividing the midpoint of the boundary edge with a vertex, an
     </tr>
   </table>
 </div>
-
 <br>
-
 <div align = "left">
-<p class = "medium">
 <b><i>Loop Subdivision: A Walkthrough:</i></b>
-</p>
 </div>
-<br>
 <div align = "middle">
 <img src="images/part6/weighting_walkthrough.png" align="middle" width="800px"/>
 <figcaption align="middle">Vertex Weighting Walkthrough</figcaption>
@@ -474,8 +437,6 @@ and otherwise, <var>u</var> is (3/(deg(v) * 8)). While we’re iterating through
 their <code>isNew</code> tracker flags to be false (we’ll see why later).
 </p>
 </div>
-
-
 <div align = "justify">
 <p class = "medium">
 As we know, in loop subdivision, we will add a new vertex on every starter edge, and we will of course need to assign a position to these new
@@ -486,8 +447,6 @@ edges are all starter edges, so we will set their <code>isNew</code> tracker fla
 tracking array of <code>old_edges</code>, and push all edges we iterate over into this array.
 </p>
 </div>
-
-
 <div align = "justify">
 <p class = "medium">
 Now, with all the mise en place complete, we can begin the actual mesh modifications. We start by splitting all of the starter edges (in <code>old_edges</code>)
@@ -496,28 +455,21 @@ make a tiny alteration to this function; when an edge is split, we assign the ne
 split edge.
 </p>
 </div>
-
-
 <div align = "justify">
 <p class = "medium">
 The second to last step in loop subdivision is to flip every edge that links two starter vertices, so we can simply iterate through all our edges
 and check, flipping edges with our <code>edgeFlip</code> function from task 4 as aforementioned.
 </p>
 </div>
-
-
 <div align = "justify">
 <p class = "medium">
 Finally, all we need to do is push the updates to the vertex positions, so for all vertices, just set their <code>position</code> field to be
 equal to their <code>newPosition</code> field!
 </p>
 </div>
-
-
+<br>
 <div align = "left">
-<p class = "medium">
 <b><i>Upsample Dulling, or The Problem With Edges and Corners:</i></b>
-</p>
 </div>
 <div align = "justify">
 <p class = "medium">
@@ -525,7 +477,6 @@ For many meshes, subdivision smoothes the low-poly appearance of a model, which 
 becomes more granular, and the model appears to be higher quality (see the teapot comparison above).
 </p>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -540,7 +491,6 @@ becomes more granular, and the model appears to be higher quality (see the teapo
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 Unfortunately, edges and corners don’t hold up well under loop subdivision. As we subdivide the mesh, if we observe the way the loop subdivision
@@ -549,7 +499,6 @@ and reweight our starter vertices similarly. As a result, sharp mesh elements, l
 as they regress to the vertices neighboring them.
 </p>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -564,7 +513,6 @@ as they regress to the vertices neighboring them.
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 We can temper this effect a bit, by pre-splitting some edges, although this is far from the sharpness that would be acceptable for creasing.
@@ -574,9 +522,7 @@ is apparent, considerably more so than without preprocessing.
 </div>
 <br>
 <div align = "left">
-<p class = "medium">
 <b><i>Asymmetric Upsampling:</i></b>
-</p>
 </div>
 <div align = "middle">
   <table style="width=100%">
@@ -593,7 +539,6 @@ is apparent, considerably more so than without preprocessing.
   </table>
 </div>
 <br>
-
 <div align = "justify">
 <p class = "medium">
 The issue that causes the weird asymmetry when subdividing the cube is actually an underlying artifact of the mesh’s triangulation. Notice that the
@@ -601,7 +546,6 @@ underlying geometry triangulation splits each face along only one diagonal? The 
 triangles will be oriented exactly as the starter triangles were.
 </p>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -616,7 +560,6 @@ triangles will be oriented exactly as the starter triangles were.
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 The intuition becomes starkly apparent when we compare the subdivision right before the reweighting of our asymmetric triangulation
@@ -626,7 +569,6 @@ combinations of the vertices will necessarily mirror this orientation. Put anoth
 asymmetry in the first subdivision, which in turn leads to asymmetry in the second subdivision ad infinitum.
 </p>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -641,18 +583,14 @@ asymmetry in the first subdivision, which in turn leads to asymmetry in the seco
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 We can fix this issue by splitting every diagonal edge first, thereby imposing a symmetric distribution of vertices. Essentially now, since the
 initial triangulation is symmetric, any additional vertices will be symmetrically added, and symmetrically reweighted as well.
 </p>
 </div>
-<br>
 <div align = "left">
-<p class = "medium">
 <b><i>Boundaries:</i></b>
-</p>
 </div>
 <div align = "justify">
 <p class = "medium">
@@ -661,8 +599,6 @@ vertex such that it has position: (1/8) * A + (3/4) * B + (1/8) * C. Then for al
 the original edge at the center. Did this work?
 </p>
 </div>
-
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -677,7 +613,6 @@ the original edge at the center. Did this work?
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 Kind of... we can see that this new scheme certainly doesn’t ignore boundary elements, but it looks a little odd. There seems to be noise in the
@@ -686,13 +621,8 @@ that I am misinterpreting some part. I think I may be misunderstanding the weigh
 this part out, they all point to this same weighting scheme. On the bright side, at least it doesn’t crash upsampling the Beetle car.
 </p>
 </div>
-
-
-<br>
 <div align = "left">
-<p class = "medium">
 <b><i>Triadic Subdivision:</i></b>
-</p>
 </div>
 <div align = "middle">
   <table style="width=100%">
@@ -722,7 +652,6 @@ this part out, they all point to this same weighting scheme. On the bright side,
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 This is an interesting alternate subdivision mode. The basis for this mode of upsampling is as follows: first, we will precalculate (as in loop
