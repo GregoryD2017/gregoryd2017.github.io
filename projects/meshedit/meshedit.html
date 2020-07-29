@@ -130,7 +130,7 @@ parameter <var>t</var>, which helps to visualize the entire Bezier curve.
 </div>
 <br>
 
-<h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
+<h3 align="left">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
 
 <br>
 <div align = "middle">
@@ -254,7 +254,6 @@ as a result. As per the guide, we element assign <b>every</b> half edge, vertex,
 starting state.
 </p>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -269,7 +268,6 @@ starting state.
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 This process is really difficult to internalize through text, thus the provided diagram documents the procedure pictorially.
@@ -294,15 +292,6 @@ but again with edge flips we can just skip this step.
 </p>
 </div>
 
-<div align = "justify">
-<p class = "medium">
-Truthfully, debugging was quite straightforward in this case. I noticed that edge flipping once, then flipping the base of the newly set triangle
-would propagate a mesh tear. I simply checked the neighbor assignments, and found an incorrect setting for the vertex of a half edge. Updating this
-parameter quickly remedied the issue.
-</p>
-</div>
-
-
 <h3 align="left">Part 5: Half-edge split</h3>
 
 <div align = "justify">
@@ -314,7 +303,6 @@ for the new central vertex, and the vertices that radiate out from it. It is imp
 midpoint of the edge it cuts.
 </p>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -343,7 +331,6 @@ midpoint of the edge it cuts.
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 Edge splits are perhaps even more tedious to explain in text than edge flips are, so again, the diagram should elucidate the general methodology.
@@ -354,9 +341,7 @@ Edge splits are perhaps even more tedious to explain in text than edge flips are
 <img src="images/part5/edge_split.png" align="middle" width="800px"/>
 <figcaption align="middle">Edge Split Walkthrough</figcaption>
 </div>
-
 <br>
-
 <div align = "justify">
 <p class = "medium">
 Again put concretely we’ll essentially use the same walkthrough as task 4. We’ll take a look at the picture on the left side, and attempt to
@@ -367,13 +352,6 @@ the component mapping was slightly more intuitive for me that way). Now we will 
 assigning their corresponding fields based on the picture on the right side, the split edge side (an example has been done in the diagram for
 reference). Finally, for edge splits, we will not need to delete components, however in my implementation, we actually did delete one edge,
 two half edges, and 2 faces (to account for the extra components created).
-</p>
-</div>
-
-<div align = "justify">
-<p class = "medium">
-Surprisingly, this did not require any debugging. Being super careful in the diagram generation, and following it absolutely meant that this
-worked right after implementation. Lucky.
 </p>
 </div>
 <br>
@@ -391,7 +369,6 @@ worked right after implementation. Lucky.
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 Note the boundary edges split correctly as well. Instead of leaving boundary edges unsplit, I simply split the boundary
@@ -416,7 +393,6 @@ triangle in two, by dividing the midpoint of the boundary edge with a vertex, an
     </tr>
   </table>
 </div>
-<br>
 <div align = "left">
 <b><i>Loop Subdivision: A Walkthrough:</i></b>
 </div>
@@ -538,7 +514,6 @@ is apparent, considerably more so than without preprocessing.
     </tr>
   </table>
 </div>
-<br>
 <div align = "justify">
 <p class = "medium">
 The issue that causes the weird asymmetry when subdividing the cube is actually an underlying artifact of the mesh’s triangulation. Notice that the
