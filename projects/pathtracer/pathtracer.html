@@ -576,47 +576,38 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
       </td>
     </tr>
   </table>
-</div>
 <br>
-<div align = "justify">
 <p class = "medium">
 We already got a glimpse into how we can leverage statistics to improve renders with part 4’s Russian Roulette algorithm, and in that case we got a faster render time, but this
 doesn’t always mean statistical analysis and iteration of algorithms are used for speed. In fact, adaptive sampling trades longer render times (sometimes extremely longer) for
 clearer quality renders that cancel some of the noise.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 Intuitively, adaptive sampling is testing whether or not our illumination has been constrained. We’ll generate a confidence interval, where a compressed confidence interval
 suggests we are reasonably sure that the illuminance will not be altered much by additional sampling, and a wide confidence interval suggests the opposite. This way, we can
 <b>adapt</b> the sampling frequency to prevent it from being unnecessarily static.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 My implementation of adaptive sampling is a direct encoding of the adaptive sampling algorithm. We will terminate tracing rays through a pixel if
 <code>I <= maxTolerance * avg_illuminance; I = 1.96 * SD_illuminance / sqrt(sample_count)</code>.  When tracing the <code>num_samples</code> rays through pixel <code>(x, y)</code>,
 we keep tracker variables <code>s1</code> and <code>s2</code>, where <code>s1</code> is the sum of the illuminance samples of pixel <code>(x, y)</code>, and <code>s2</code> is
 the sum of the squares of the illuminance samples of pixel <code>(x, y)</code>).
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 We’ll batch sample to optimize our efficiency. What this means is that we will sample <code>samplesPerBatch</code> pixels each time, then test our termination statement.
 From <code>s1</code> and <code>s2</code>, we can calculate the average illumination from <code>s1 / sample_count</code>, and the variance (which is just the square of the SD)
 from <code>(1 / (sample_count - 1)) * (s2 - s1 * s1 / n)</code>. If our termination statement passes, we’ll simply end our Monte Carlo estimation earlier, otherwise, we’ll
 keep sampling before we max out at <code>ns_aa</code> samples.
 </p>
-</div>
-
+<br><br><br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
       <td>
-        <img src="images/intro/CBbunny.png" align="middle" width="300"/>
+        <img src="images/intro/CBbunny_material.png" align="middle" width="300"/>
       </td>
       <td>
         <img src="images/intro/CBlucy.png" align="middle" width="300"/>
@@ -627,26 +618,10 @@ keep sampling before we max out at <code>ns_aa</code> samples.
     </tr>
   </table>
 </div>
-
-<br><br>
-
-<div>
-
-
-<br><br>
-
-<h2 align="middle">Section I: Glass and Mirrors</h2>
-
-<h3 align="middle">Variation in Max Ray Depth</h3>
-
-<div align = "justify">
-<p class = "medium">
-<i>All images rendered with 256 samples per pixel and 4 light rays per sample.</i>
-</p>
-</div>
-
+<h2 align="left">Section IV: Glass and Mirrors</h2>
+<h3 align="left">Variation in Max Ray Depth</h3>
 <br>
-
+<i>All images rendered with 256 samples per pixel and 4 light rays per sample.</i>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -661,10 +636,7 @@ keep sampling before we max out at <code>ns_aa</code> samples.
     </tr>
   </table>
 </div>
-
 <br>
-
-<div align = "justify">
 <p class = "medium">
 Notice on the left, with maximal ray depth 0, we see only the light's illumination. If light is not allowed to
 bounce even once, only direct light emission is captured in our render. In other words, only objects that directly
@@ -679,10 +651,6 @@ our reflective BRDF, we query the spectrum arriving from another point. If the o
 (see the small white patches on the spheres). For the most part however, the reflected light is nonexistent, since the light bounce samples
 non-emissive surfaces.
 </p>
-</div>
-
-<br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -697,10 +665,6 @@ non-emissive surfaces.
     </tr>
   </table>
 </div>
-
-<br>
-
-<div align = "justify">
 <p class = "medium">
 As we increase the number of light bounces, the materials themselves will begin to resemble realistic glass and mirrors.
 At this point, it is probably useful to describe how exactly reflections and refractions are computed. We eschew the Fresnel
@@ -714,9 +678,7 @@ the dot product between the light ray and the intersect surface normal, where a 
 air into the material (<code>eta = 1 / ior </code>) and a negative dot product implies the light ray traverses through the material into
 air (<code>eta = ior </code>).
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 With 2 light ray bounces, we start to see the true nature of the materials. We can clearly see that the mirror sphere does
 reflect its surroundings. Sort of. Notice the ceiling appears to be black, as does the floor. Intuitively, this is logical
@@ -731,9 +693,7 @@ in the vague semblances of the Cornell box we can see in the glass sphere, or we
 the next light bounce will hit the exiting point of the sphere, thus again, we fail to really reach the light before exhausting our light bounce limit,
 resulting in this odd occluded appearance to our sphere.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 3 light bounces is where many of these issues start to be cleaned up. The chrome mirror ball now correctly reflects
 the lit ceiling and floor since from the intersection of the cast ray and the chrome ball, the light can now bounce
@@ -747,10 +707,7 @@ focuses under the glass sphere. This is expected since light that passes from th
 refract through the glass, into the focused circle projected onto the ground (Snell's law), and while we start to see this effect with 2 light
 ray bounces, as the refraction itself is cleaned up, so too is the light projection onto the ground.
 </p>
-</div>
-
 <br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -765,9 +722,6 @@ ray bounces, as the refraction itself is cleaned up, so too is the light project
     </tr>
   </table>
 </div>
-
-<br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -782,10 +736,7 @@ ray bounces, as the refraction itself is cleaned up, so too is the light project
     </tr>
   </table>
 </div>
-
 <br>
-
-<div align = "justify">
 <p class = "medium">
 We can combine the analysis of the next 3 images, since we hit the point of diminishing return well before a ray depth of 100.
 With a ray depth of 4, the mirror ball looks very similar. The main difference is in the reflection of the glass sphere in
@@ -794,9 +745,7 @@ giving an extra light bounce means the camera ray can intersect the glass sphere
 refract through the glass, hit the wall on the other side, then intersect the light. In other words, we are adding an additional
 vector of light transport (quite literally) by increasing the number of bounces.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 As for the glass ball the main interesting new feature is the small patch of focused light on the blue wall. If we think about a
 camera ray cast at this point, in the past, most of the lighting here was probably a result of indirect lighting or direct lighting
@@ -805,9 +754,7 @@ to intersect the glass ball, and refract through it to the other side. The key i
 the outgoing light beam to now travel to the light itself. With 3 bounces, the refractive property of the glass means rays from the light patch exiting the
 sphere would not be likely to intersect the overhead light, preventing additional lighting focus on the wall patch.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 With 5 and 100 light bounces, the difference is pretty minute. For the most part, the more we let the light bounce, the cleaner
 and more realistic the lighting effects, and thus the material effects will be. We can see the reflections and refractions become less
@@ -817,22 +764,11 @@ that it really justifies the extra computation required. As a side note, we do n
 more light bounces, which again can be explained by the same reasoning just applied to diffuse materials instead. Shadows are generally softer
 as light bounces more, reducing the harsh shadow boundaries by lighting them up with indirect light paths.
 </p>
-</div>
-
-
 <br><br>
-
-<h2 align="middle">Section II: Thin Lenses and Depth of Field</h2>
-
+<h2 align="middle">Section V: Thin Lenses and Depth of Field</h2>
 <br>
-
-<div align = "left">
 <p class = "medium">
-<b><i>Pinhole Camera Model vs. Thin Lens Camera Model</i></b>
-</p>
-</div>
-<div align = "justify">
-<p class = "medium">
+<b><i>Pinhole Camera Model vs. Thin Lens Camera Model</i></b><br>
 From a physical standpoint, the major difference between the pinhole camera model and the thin lens camera model is (predictably)
 the utilization of a lens. A pinhole camera model has an infinitely small "aperture", and one of the consequences of the pinhole camera model is
 the fact that all light rays bouncing off an object will traverse the pinhole, and reflect perfectly across the pinhole. This perfect reflection means
@@ -841,9 +777,7 @@ the thin lens model, only if the sensor plane matches the plane where an object 
 what this implies is given many different objects, at many different depths, it is impossible for all of them to be in focus at once, unlike in the
 pinhole camera model.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 The thin lens is mimicked by assuming a discrete aperture size, and an infinitesimally thin lens. Each lens has an inherent focal length, and we know that given
 a set of parallel rays from an object in our environment, if they traverse the thin lens, they will cross the focus. Where these parallel rays converge, we define
@@ -855,10 +789,7 @@ between the intersection of the sampled and chief ray and the sensor position th
 <code>C = A * abs(Zs - Zi) / Zi</code> where <code>A</code> is the aperture diameter, <code>Zs</code> is the distance between the lens and the sensor location, and <code>Zi</code> is the distance
 between the plane of focus and the lens. As a result, we can illustrate some really cool depth of field effects.
 </p>
-</div>
-
 <br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -873,9 +804,6 @@ between the plane of focus and the lens. As a result, we can illustrate some rea
     </tr>
   </table>
 </div>
-
-<br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -890,25 +818,15 @@ between the plane of focus and the lens. As a result, we can illustrate some rea
     </tr>
   </table>
 </div>
-
-<br>
-
-
 <div align = "left">
 <p class = "medium">
-<b><i>Aperture Size</i></b>
-</p>
-</div>
-<div align = "justify">
-<p class = "medium">
+<b><i>Aperture Size</i></b><br>
 What happens when we alter the size of the aperture? We can see from the circle of confusion formula above that increasing the aperture size results in an increased
 circle of confusion. Practically, this means images with out-of-focus objects will look blurrier, and indeed we see exactly this below. Intuitively, having a larger
 lens area to sample implies a larger variance, and thus larger expected angle between two sampled rays, which inherently increases the diameter of the circle of confusion inevitably.
 </p>
 </div>
-
 <br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -923,9 +841,6 @@ lens area to sample implies a larger variance, and thus larger expected angle be
     </tr>
   </table>
 </div>
-
-<br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
