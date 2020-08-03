@@ -44,9 +44,9 @@ hide: true
 Incredibly intuitive, but equally powerful, Pathtracing is a technique to simulate virtual light, and the way it interacts with the world. I learned about the general ray tracing pipeline, material simulation and optics (reflection,
 and BSDF), ray and intersection geometry (Moller-Trumbore algorithm), and PathTracing optimizations (BVH and Adaptive Sampling).
 </p>
-<br>
 <h2 align="left">Section I: Intersection Testing, Ray Generation, Acceleration Structures</h2>
 <h3 align="left">Part 1: Ray Generation and Scene Intersection:</h3>
+<br>
 <div align = "justify">
 <p class = "medium">
 <b><i>Overview of the Ray Casting Process:</i></b><br>
@@ -59,15 +59,8 @@ pixel. This is the value that will ultimately be written to the scene buffer.
 </p>
 </div>
 
-<br>
-
-<div align = "left">
 <p class = "medium">
-<b><i>Camera Ray Generation:</i></b>
-</div>
-</p>
-<div align = "justify">
-<p class = "medium">
+<b><i>Camera Ray Generation:</i></b><br>
 Of course, we can’t appeal to this abstract notion of camera ray generation, so let us concretize what that truly means. To generate the camera rays themselves, once we get the
 normed world space pixel coordinates (normed by screen width and height dimensions), we first need to determine the map into camera space. This is relatively simple, since as
 long as we know the horizontal and vertical fields of view <code>hFov</code> and <code>vFov</code> respectively), we can simply correspond the top right of world space (1, 1)
@@ -75,17 +68,9 @@ to <code>(tan(0.5 * hFov), tan(0.5 * vFov), -1)</code>, and the bottom left to <
 transformation from normed world space to camera space, and having determined the camera space coordinate of the position we passed in, we can create a vector (the direction)
 from the camera to this point, then transform the origin (camera location) and direction to world space. With an origin and direction in world space, our ray is fully defined!
 </p>
-</div>
 
-<br>
-
-<div align = "left">
 <p class = "medium">
-<b><i>Primitive Intersection:</i></b>
-</div>
-</p>
-<div align = "justify">
-<p class = "medium">
+<b><i>Primitive Intersection:</i></b><br>
 Our pathtracing algorithm depends on the ability to deal with intersections with primitives in our scene, and as such, we implement procedures to handle intersections with
 triangles, and intersections with spheres. At a high level, when a ray is cast into the scene, we will test the primitives in its path, searching for intersections. Every
 primitive’s intersect method requires a ray, and an intersection object. If we determine that the ray in fact intersects the primitive, and has not yet intersected another
@@ -93,39 +78,14 @@ primitive (the time field of the intersection object is not less than the inters
 this value to the intersection object’s time field.  We will further provide references to the primitive of intersection, the bsdf of the primitive intersected, and the normal
 to the primitive. In this way, intersection objects track all the necessary information to eventually handle light-object reflections.
 </p>
-</div>
 
-<br>
-
-<div align = "left">
 <p class = "medium">
 <b><i>Intersecting Triangles:</i></b>
-</div>
-</p>
-
-<div align = "justify">
-<p class = "medium">
 Since we’ll end up intersecting millions of triangles during our stint with pathtracing, we’ll seek to optimize the ray-triangle intersection as much as possible. To that end,
 we will leverage and implement the Moller-Trumbore algorithm. The Moller-Trumbore algorithm hinges on basic linear algebra, and is far more complicated than I give it credit;
 a much more thorough explanation can be found <a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection" target = "_blank">here</a>.
 </p>
-</div>
-
-<div align = "justify">
-<p class = "medium">
-Given a triangle defined by points <code>p0</code>, <code>p1</code> and <code>p2</code>, and a ray defined by origin <code>O</code> and direction <code>D</code>, parametrized by
-time <code>t</code>, we can leverage barycentric coordinates to determine that an intersection of the two satisfies the equality: <code>O + tD = p0 + b1(p1 - p0) + b2(p2 - p0)</code>.
-Recasting this equation as a matrix, we can thus determine the equality: <code>Mx = b</code> where <code>M = [-D, p1 - p0, p2 - p0]</code>, <code>x = [t, b1, b2]</code>,
-and <code>b = O - p0</code>. A simple application of Cramer’s Rule allows us to determine that with a triangle-ray intersection, <code>x = 1 / [S1 * E1] x [dot(S2, E2), dot(S1, S) , dot(S2, D)]</code>;
-<code>E1 = p1 - p0, E2 = p2 - p0, S = O - p0, S1 = D x E2, S2 = S x E1</code>. This will allow us to determine <code>t</code>, <code>b1</code>, and <code>b2</code>,
-and since <code>t</code> is a recast of time, and <code>b1</code> and <code>b2</code> are based on the formulation of barycentric coordinates, this implies we see a valid
-triangle ray intersection only if <code>t</code> is equal to or greater than 0, <code>b1</code> and <code>b2</code> are between 0 and 1 inclusive, and <code>(1 - b1 - b2)</code>
-is less than or equal to 1. Given any ray and triangle, we thus can easily determine whether the ray intersects the triangle using the Moller-Trumbore algorithm as defined.
-</p>
-</div>
-
-<br><br>
-
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -140,20 +100,11 @@ is less than or equal to 1. Given any ray and triangle, we thus can easily deter
     </tr>
   </table>
 </div>
-
-<br><br>
-
-
-<h3 align="middle">Part 2: The Bounding Volume Hierarchy (BVH):</h3>
-
-<div align = "left">
+<br>
+<h3 align="left">Part 2: The Bounding Volume Hierarchy (BVH):</h3>
+<br>
 <p class = "medium">
 <b><i>An Overview of BVH Generation:</i></b>
-</div>
-</p>
-
-<div align = "justify">
-<p class = "medium">
 Intuitively, the BVH construction algorithm aims to cut the elements into partitions in a way that can accelerate our ray-primitive intersection tests. Our construction function
 takes as input a <code>start</code> iterator, an <code>end</code> iterator, and a maximal leaf size. The start and end iterators essentially allow us to iterate over all the
 primitives that are either in this node (the root), or the subnodes of this node. We can abstract away the fact that the complete 1D vector of primitives is stored only once
@@ -162,9 +113,7 @@ all the primitives using our start and end iterators and simultaneously create a
 If the number of primitives is fewer than the maximal leaf size, we can just make a leaf with the complete bounding box, with no left or right subnode, whose start and end
 iterators point to the start and end iterators we passed to the function.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 Otherwise, we know we have more elements that can be efficiently captured in one leaf, so we must generate a larger tree structure. To this end, we will first determine the
 longest axis of our primitives bounding box, since we will partition the elements depending on their position along the longest axis. Without loss of generality, assume the
@@ -173,28 +122,21 @@ whose x-coordinate is less than or equal to the midpoint we calculated, and prim
 To avoid an infinite recursion overflow, we have to avoid cases that leave either the left or right subvectors empty. A simplistic (and admittedly poorly optimized) way of doing
 this is randomly cutting our collection of primitives such that half of the primitives are set to the left vector, and the other half to the right vector.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 We must now reformat the primitives in the complete primitives vector (remember, this vector is stored only once in memory) such that the iterators mirror the state of the
 BVH. What this means is that we simply need to determine the index in the complete primitives vector of the start iterator and the end iterator. Then we will copy the elements
 in the left vector to the complete primitives vector from the <code>start</code> index, to the <code>start + left.size()</code> index, and copy the elements in the right vector
 from the <code>start + left.size()</code> index to the <code>end</code> iterator’s index.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 Having reformatted the underlying complete primitives vector, we can now recursively instantiate the left and right branch of our BVH tree. We will set the <code>left</code> field of our root
 node to the result of constructing a BVH with start iterator equal to the <code>start</code> iterator passed in to the root construct, and <code>end</code> iterator equal to the
 <code>start iterator + left.size()</code>. We will set the right field of our root node to the result of constructing a BVH with <code>start</code> iterator equal to
 <code>start + left.size()</code>, and an <code>end</code> iterator equal to the <code>end</code> iterator passed into the root construct. This allows us to recursively construct our BVH!
 </p>
-</div>
-
-<br><br>
-
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -209,11 +151,7 @@ node to the result of constructing a BVH with start iterator equal to the <code>
     </tr>
   </table>
 </div>
-
-<br><br>
-
-<br><br>
-
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -228,11 +166,7 @@ node to the result of constructing a BVH with start iterator equal to the <code>
     </tr>
   </table>
 </div>
-
-<br><br>
-
-<br><br>
-
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -247,9 +181,7 @@ node to the result of constructing a BVH with start iterator equal to the <code>
     </tr>
   </table>
 </div>
-
-<br><br>
-
+<br>
 <div align = "middle">
   <table border = "1">
     <tr>
@@ -289,17 +221,9 @@ node to the result of constructing a BVH with start iterator equal to the <code>
     </tr>
   </table>
 </div>
-
-<br><br>
-
-<div align = "left">
+<br>
 <p class = "medium">
-<b><i>Timing Comparison:</i></b>
-</div>
-</p>
-
-<div align = "justify">
-<p class = "medium">
+<b><i>Timing Comparison:</i></b><br>
 As you can clearly see from the table above, the difference is stark, and immediately it is clear why we apply this sort of optimization to intersection tests. Take for instance
 CBdragon.dae, which renders in about 0.2271 seconds with our BVH optimization. And without? It renders at an <i>abysmal</i> 406.0455 seconds, which is almost 7 minutes. This means BVH has
 sped up rendering times by an incredible factor of <b>1787</b>.  Rendering scenes with normal shading, even without tracing light can already take minutes without our BVH optimization, but
@@ -310,17 +234,12 @@ test any of the triangles encapsulated by the bounding box, and we won’t need 
 testing millions of primitives just with this simple optimization. Of course, this isn’t a perfect solution. Since bounding volumes are split by primitive collection, not pure space,
 there are some inefficiencies with overlapping bounding volumes, for which we need to intersect test both overlapping volumes, however, in our unoptimized version, we must test all
 primitives with each ray, which is clearly far worse.
-
 </p>
-</div>
-
-<br><br><br><br>
-
+<br><br>
 <h2 align="middle">Section II: Lighting Calculations or The Heart of PathTracing</h2>
 
 <h3 align="middle">Part 3: Direct Illumination:</h3>
-
-<br><br>
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
