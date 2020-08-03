@@ -49,7 +49,7 @@ and BSDF), ray and intersection geometry (Moller-Trumbore algorithm), and PathTr
 <br>
 <div align = "justify">
 <p class = "medium">
-<b><i>Overview of the Ray Casting Process:</i></b><br>
+<<strong><i>Overview of the Ray Casting Process:</i></strong><br>
 We can imagine looking at a grid of pixels. For each pixel <var>(x, y)</var> we need to somehow take an estimate of the radiance for this pixel, then write the corresponding
 Spectrum to a frame buffer. For this process, we will use Monte Carlo estimation, an interesting, compact and powerful estimation algorithm that will enable us to take an
 unbiased estimate of the radiance for each pixel. To that end, for each pixel, we will take <code>ns_aa samples</code>, where for each sample, we will take a random position in
@@ -104,7 +104,7 @@ a much more thorough explanation can be found <a href="https://www.scratchapixel
 <h3 align="left">Part 2: The Bounding Volume Hierarchy (BVH):</h3>
 <br>
 <p class = "medium">
-<b><i>An Overview of BVH Generation:</i></b>
+<b><i>An Overview of BVH Generation:</i></b><br>
 Intuitively, the BVH construction algorithm aims to cut the elements into partitions in a way that can accelerate our ray-primitive intersection tests. Our construction function
 takes as input a <code>start</code> iterator, an <code>end</code> iterator, and a maximal leaf size. The start and end iterators essentially allow us to iterate over all the
 primitives that are either in this node (the root), or the subnodes of this node. We can abstract away the fact that the complete 1D vector of primitives is stored only once
@@ -151,7 +151,6 @@ node to the result of constructing a BVH with start iterator equal to the <code>
     </tr>
   </table>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -166,7 +165,6 @@ node to the result of constructing a BVH with start iterator equal to the <code>
     </tr>
   </table>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -236,9 +234,9 @@ there are some inefficiencies with overlapping bounding volumes, for which we ne
 primitives with each ray, which is clearly far worse.
 </p>
 <br><br>
-<h2 align="middle">Section II: Lighting Calculations or The Heart of PathTracing</h2>
-
-<h3 align="middle">Part 3: Direct Illumination:</h3>
+<h2 align="left">Section II: Lighting Calculations or The Heart of PathTracing</h2>
+<br>
+<h3 align="left">Part 3: Direct Illumination:</h3>
 <br>
 <div align = "middle">
   <table style="width=100%">
@@ -254,9 +252,6 @@ primitives with each ray, which is clearly far worse.
     </tr>
   </table>
 </div>
-
-<br><br>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -271,26 +266,15 @@ primitives with each ray, which is clearly far worse.
     </tr>
   </table>
 </div>
-<br><br>
-
-
-
-<div align = "left">
+<br>
 <p class = "medium">
-<b><i>Uniform Hemisphere Lighting:</i></b>
-</div>
-</p>
-
-<div align = "justify">
-<p class = "medium">
+<b><i>Uniform Hemisphere Lighting:</i></b><br>
 To implement Uniform Hemisphere Lighting (UHL), we assume, from part 1, we have already traced a ray from our camera into our scene, and we’ve found an intersection! The question
 now is: is there radiance that travels from a light source to our intersection, such that it will bounce back along the ray we’ve traced to the camera, lighting up the pixel? We
 will again employ Monte Carlo Estimation here to attempt to approximate the intersection irradiance, which will thus tell us how much light will bounce off our intersected object,
 to our camera.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 We implement <code>estimate_direct_lighting_hemisphere</code>, which is passed a ray object <code>r</code>, and an intersection object that represents the intersection of the
 ray with some primitive. Tracing the Monte Carlo estimation procedure, for each of our <code>n</code> samples, we will calculate a random direction in the hemisphere of our
@@ -301,18 +285,9 @@ through the ray, we can calculate the radiance that will be passed to the camera
 transported to the camera supposing irradiance <code>E</code> will be <code>2PI * bsdf(dir_camera, dir_light) * E * cos(angle between light and intersection primitive)</code>.
 Calculating this for each of our samples, we simply average the radiance that reaches the camera to generate our UHL for each pixel.
 </p>
-</div>
 
-<br>
-
-<div align = "left">
 <p class = "medium">
-<b><i>Light Importance Sampling:</i></b>
-</div>
-</p>
-
-<div align = "justify">
-<p class = "medium">
+<b><i>Light Importance Sampling:</i></b><br>
 To implement Light Importance Sampling (LIS) we will perform roughly the same process, the difference being, we will eschew sampling randomly in a hemisphere in favor of sampling
 only in the area of the light elements. This is like the difference of first aiming our shot before attempting to shoot a basketball vs. randomly bouncing the basketball in the
 room, and hoping it lands in the basket. As you might imagine, the first option results in a drastically higher chance of actually ending up in the basket. As with UHL, we first
@@ -324,9 +299,7 @@ to the area of the light. We will then check again to make sure that we aren’t
 is facing the light, but this is as simple as checking to ensure the cosine of the angle from UHL is between 0 and Pi. If you hold out your hand with the palm facing down, your
 lights won’t directly reach the palm of your hand!
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 There are two caveats to this part. In our reflection radiance calculation from UHL, we multiplied by <code>2PI</code>, but this doesn’t quite work anymore. In actuality, we
 were abstractly dividing by the pdf, the probability density function of sampling such a specific direction, which in the case of a uniform hemisphere is exactly uniform
@@ -335,14 +308,11 @@ uniform constant pdf. The second hitch is the case of point lights. A point ligh
 also means we don’t really need to sample <code>ns_area_light samples</code>, 1 ought to be enough! Either we’re shadowed against the point light or we aren’t. Thus we can early
 out of the sampling procedure, but otherwise, this case is a mirror for area light sampling.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 Finally, after estimating the radiance arriving from the ray casted to the scene intersecting primitive <code>p</code> for each of the lights, we simply divide this total
 radiance by the number of samples, to complete our Monte Carlo Estimator.
 </p>
-</div>
 
 <br>
 
