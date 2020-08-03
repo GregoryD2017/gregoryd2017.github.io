@@ -3,7 +3,19 @@ title: Pathtracer
 layout: page
 hide: true
 ---
-<<!DOCTYPE html>
+<!DOCTYPE html>
+<style>
+  img {
+    margin: auto;
+    display: block;
+    max-width: 99%;
+    height: auto;
+    width: auto\9;
+  }
+
+  p.medium {line-height : 1.5;}
+</style>
+
 <html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
@@ -14,19 +26,19 @@ hide: true
   <table style="width=100%">
     <tr>
       <td>
-        <img src="images/intro/bunny.png" align="middle" width="500"/>
-        <figcaption align="middle">CBbunny Adaptive Sampled (2048 Samples per Pixel)</figcaption>
+        <img src="images/intro/CBbunny.png" align="middle" width="300"/>
       </td>
       <td>
-        <img src="images/intro/CBspheres_lambertian.png" align="middle" width="500"/>
-        <figcaption align="middle">CBspheres Adaptive Sampled (2048 Samples per Pixel)</figcaption>
+        <img src="images/intro/CBbunny_Global.png" align="middle" width="300"/>
+      </td>
+      <td>
+        <img src="images/intro/CBbunny_material.png" align="middle" width="300"/>
       </td>
     </tr>
   </table>
 </div>
 
 <div>
-
 <h2 align="middle">Overview</h2>
 <p class = "medium">
 Incredibly intuitive, but equally powerful, Pathtracing is a technique to simulate virtual light, and the way it interacts with the world. I learned about the general ray tracing pipeline, material simulation and optics (reflection,
