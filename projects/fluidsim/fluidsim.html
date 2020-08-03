@@ -3,7 +3,19 @@ title: APIC Fluid Simulation
 layout: page
 hide: true
 ---
-<<!DOCTYPE html>
+<!DOCTYPE html>
+<style>
+  img {
+    margin: auto;
+    display: block;
+    max-width: 99%;
+    height: auto;
+    width: auto\9;
+  }
+
+  p.medium {line-height : 1.5;}
+</style>
+
 <html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
@@ -60,6 +72,13 @@ are able to generate non dissipative fluid models by purposefully tracking addit
 Here are some comparisons between the PIC solver, FLIP solver, and APIC solver. As Jiang et al. note in the <a href="https://www.youtube.com/watch?v=rPPW_1M8nRA&feature=emb_logo" target=_blank>APIC introduction video</a>,
 The natural vorticity of fluids is encapsulated by APIC solvers, and compared to FLIP, APIC is noticeably more stable during fluid splashes. FLIP and APIC are both more energetic that PIC, which is most likely a byproduct of the fact that PIC is a dissipative fluid model.
 </p>
+
+<div align = "center">
+  <video width = "700" height = "500" controls>
+    <source src="animations/vertical_column_comparison.mp4" type="video/mp4">
+  </video>
+
+</div>
 
 <h3 align="left">Moving Forward</h3>
 <p class = "medium">
