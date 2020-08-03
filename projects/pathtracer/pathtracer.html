@@ -49,7 +49,7 @@ and BSDF), ray and intersection geometry (Moller-Trumbore algorithm), and PathTr
 <br>
 <div align = "justify">
 <p class = "medium">
-<<strong><i>Overview of the Ray Casting Process:</i></strong><br>
+<b><i>Overview of the Ray Casting Process:</i></b><br>
 We can imagine looking at a grid of pixels. For each pixel <var>(x, y)</var> we need to somehow take an estimate of the radiance for this pixel, then write the corresponding
 Spectrum to a frame buffer. For this process, we will use Monte Carlo estimation, an interesting, compact and powerful estimation algorithm that will enable us to take an
 unbiased estimate of the radiance for each pixel. To that end, for each pixel, we will take <code>ns_aa samples</code>, where for each sample, we will take a random position in
@@ -80,7 +80,7 @@ to the primitive. In this way, intersection objects track all the necessary info
 </p>
 
 <p class = "medium">
-<b><i>Intersecting Triangles:</i></b>
+<b><i>Intersecting Triangles:</i></b><br>
 Since we’ll end up intersecting millions of triangles during our stint with pathtracing, we’ll seek to optimize the ray-triangle intersection as much as possible. To that end,
 we will leverage and implement the Moller-Trumbore algorithm. The Moller-Trumbore algorithm hinges on basic linear algebra, and is far more complicated than I give it credit;
 a much more thorough explanation can be found <a href="https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection" target = "_blank">here</a>.
@@ -313,17 +313,9 @@ out of the sampling procedure, but otherwise, this case is a mirror for area lig
 Finally, after estimating the radiance arriving from the ray casted to the scene intersecting primitive <code>p</code> for each of the lights, we simply divide this total
 radiance by the number of samples, to complete our Monte Carlo Estimator.
 </p>
-
 <br>
-
-<div align = "left">
 <p class = "medium">
-<b><i>UHL vs. LIS Quality Comparison:</i></b>
-</div>
-</p>
-
-<div align = "justify">
-<p class = "medium">
+<b><i>UHL vs. LIS Quality Comparison:</i></b><br>
 While UHL and LIS are both technically valid methods of computing Direct Lighting, taking a quick look at a side by side comparison makes it pretty obvious that LIS ought to be
 the preferred method. Even not considering the fact that UHL struggles to render point lit scenes, we can clearly see a plethora of noise scattered throughout the UHL renders,
 and this is reasonable. To reiterate an earlier point, “after all, for direct lighting, the only light that will ever reach <code>p</code> will be from one of the light sources,
@@ -335,18 +327,10 @@ and this is reasonable. To reiterate an earlier point, “after all, for direct 
  purposefully. The UHL bunny is full of graininess, wrought from light beams that were projected into non emissive surfaces. Since our samples in the LIS bunny only look where
  the light emission exists, we clear out a great deal of the grainy samples just by shifting the light beam from a non emissive surface to a light.
 </p>
-</div>
-
-
-
 <br>
-
 <div align = "left">
-<p class = "medium">
 <b><i>Light Ray Comparison (1 Sample Per Pixel):</i></b>
 </div>
-</p>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -361,7 +345,6 @@ and this is reasonable. To reiterate an earlier point, “after all, for direct 
     </tr>
   </table>
 </div>
-<br><br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -382,11 +365,8 @@ and this is reasonable. To reiterate an earlier point, “after all, for direct 
 <i>Notice the amelioration of soft shadow rendering with more light samples, serving to blur the shadowed region, precluding granularity.</i>
 </p>
 </div>
-<br><br>
-
-<h3 align="middle">Part 4: Global Illumination:</h3>
-
-<br><br>
+<br>
+<h3 align="left">Part 4: Global Illumination:</h3>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -401,24 +381,18 @@ and this is reasonable. To reiterate an earlier point, “after all, for direct 
     </tr>
   </table>
 </div>
-<br><br>
 
-<div align = "justify">
 <p class = "medium">
 There is noticeably still a feeling and semblance of artificiality with direct lighting only, and this is understandable; light doesn’t only travel from the source to the object
 to our eyes, it will bounce from place to place, focus and diffuse. This is what we attempt to mimic, of course on a smaller scale.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 The function <code>at_least_one_bounce_radiance</code> attempts to approximate the radiance of rays that will <b>back bounce</b>. The function is passed a ray object <code>r</code>,
 and an intersection object that represents the intersection of the ray with some primitive, and will recursively attempt to calculate the total direct and indirect lighting that
 will return back along <code>r</code>.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 As before, we will consider the ray <code>r</code> that we have traced into our scene, which has intersected with primitive <code>p</code>. There are a few cases we ought to
 consider. It is possible <code>p</code> itself is emissive, in which case, <code>p</code> itself will presumably emit light back through <code>r</code> into the camera. We will
@@ -431,9 +405,7 @@ clear that this is naturally a recursive lighting calculation, and if we ignore 
 Of course this would be intractably difficult to mirror, thus we will first initialize the constraint that we consider only <code>max_ray_depth</code> bounce backs of indirect
 lighting, before we cut the ray and stop the recursion.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 Now for ray <code>r</code>, once it reaches <code>p</code>, we first need to see whether this ray has recursed enough times. For each ray, we maintain a field <code>depth</code>
 which in practice tracks the number of back bounces we’ve associated with this ray. If the depth is now 1, this means we’ve bounced back so many times, we no longer will recurse,
@@ -442,28 +414,22 @@ rooted at <code>p</code>. Theoretically, we are free to use UHL or LIS, but in p
 degree lighting to compute, so we will sample the bsdf of <code>p</code>, to determine the direction of the next ray to trace, with the condition that the “out direction” is the
 opposite of <code>r</code>’s direction. Of course <code>p</code> may be directly lit, so even if we wish to recurse further, we’ll still calculate the direct lighting at <code>p</code>.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 While sampling this direction, we will also capture the pdf, the probability density function evaluated at the direction of the next ray to trace. Now we will also check to see
 if the newly cast ray intersects with an object <code>q</code> (the new ray’s depth is one less than r’s depth). If it doesn’t intersect any object <code>q</code>, logically no
 light can bounce from a nonexistent object to <code>p</code>, so no need to calculate any indirect lighting from this bounce back. If we do however intersect some object
 <code>q</code>, we know by means of the reflection equation that the radiance rooted at <code>q</code> that transports to <code>p</code> is precisely:
-<code>bsdf(dir_camera, dir_sampled) * cos(angle from sampled_dir to p) * at_least_one_bounce_radiance(ray_to_q, intersection_with_q) / pdf</code>. Thus the return value of the
+<code>bsdf(dir_camera, dir_sampled)*cos(angle from sampled_dir to p)*at_least_one_bounce_radiance(ray_to_q, intersection_with_q)/pdf</code>. Thus the return value of the
 function <code>at_least_one_bounce_radiance</code> is precisely the radiance that will be transported from <code>p</code> that requires at least a singular bounce
 (without <code>p</code>’s light emission), or in other words, the sum of the previous expression, and the direct illumination of <code>p</code>.
 </p>
-</div>
 
-<div align = "justify">
 <p class = "medium">
 This means that the global illumination that will travel counter to ray <code>r</code> that will hit the camera if <code>r</code> intersects primitive <code>p</code>, is
-precisely the <code>zero_bounce_radiance(p, isect) + at_least_one_bounce_radiance(p, isect)</code> if <code>r</code> intersects <code>p</code> with intersection <code>isect</code>.
+precisely the <code>zero_bounce_radiance(p, isect)+at_least_one_bounce_radiance(p, isect)</code> if <code>r</code> intersects <code>p</code> with intersection <code>isect</code>.
 </p>
-</div>
-
-<br><br>
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -478,23 +444,16 @@ precisely the <code>zero_bounce_radiance(p, isect) + at_least_one_bounce_radianc
     </tr>
   </table>
 </div>
-<br><br>
-
-<div align = "justify">
+<br>
 <p class = "medium">
 There is one more small note. Realistically, we don’t have to reach the <code>max_ray_depth</code> each time. Statistically speaking, we hit the point of diminishing return well
 before this, so we implement a Russian Roulette algorithm. As the name suggests, before we recurse, with some probability (0.40 in my implementation), we cut the recursion, and
 just return the radiance computed without another bounce back. The only difference this makes is that we also need to divide the q-rooted radiance equation by the probability of
 back bounce, in this case 0.60. We save on some computation time, and statistically, we’ll be looking at basically the same render.
 </p>
-</div>
 
-<div align = "left">
 <p class = "medium">
-<b><i>Maximal Ray Depth Comparison (1024 Samples Per Pixel):</i></b>
-</div>
-</p>
-
+<b><i>Maximal Ray Depth Comparison (1024 Samples Per Pixel):</i></b><br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -509,7 +468,6 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
     </tr>
   </table>
 </div>
-
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -524,7 +482,6 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
     </tr>
   </table>
 </div>
-
 <div align = "middle">
 <img src="images/task4/CBbunny_1024_m100.png" align="middle" width="500"/>
 <figcaption align="middle">CBbunny.dae Ray Depth: 100</figcaption>
@@ -536,8 +493,8 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
 <div align = "left">
 <p class = "medium">
 <b><i>Pixel Sample Rate Comparison (4 Light Rays):</i></b>
-</div>
 </p>
+</div>
 
 <div align = "middle">
   <table style="width=100%">
@@ -588,16 +545,10 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
 <img src="images/task4/Spheres_HQ.png" align="middle" width="500"/>
 <figcaption align="middle">CBspheres.dae: 1024 Samples per Pixel</figcaption>
 </div>
-
 <br><br>
-
-
-<h2 align="middle">Section III: Statistical Improvement</h2>
-
-<h3 align="middle">Part 5: Adaptive Sampling:</h3>
-
-<br><br>
-
+<h2 align="left">Section III: Statistical Improvement</h2>
+<h3 align="left">Part 5: Adaptive Sampling:</h3>
+<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -612,7 +563,6 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
     </tr>
   </table>
 </div>
-<br>
 <div align = "middle">
   <table style="width=100%">
     <tr>
@@ -627,9 +577,7 @@ back bounce, in this case 0.60. We save on some computation time, and statistica
     </tr>
   </table>
 </div>
-
-<br><br>
-
+<br>
 <div align = "justify">
 <p class = "medium">
 We already got a glimpse into how we can leverage statistics to improve renders with part 4’s Russian Roulette algorithm, and in that case we got a faster render time, but this
