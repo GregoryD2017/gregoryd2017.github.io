@@ -39,27 +39,17 @@ hide: true
 </div>
 
 <div>
-<h2 align="middle">Overview</h2>
+<h2 align="left">Overview</h2>
 <p class = "medium">
 Incredibly intuitive, but equally powerful, Pathtracing is a technique to simulate virtual light, and the way it interacts with the world. I learned about the general ray tracing pipeline, material simulation and optics (reflection,
 and BSDF), ray and intersection geometry (Moller-Trumbore algorithm), and PathTracing optimizations (BVH and Adaptive Sampling).
-
 </p>
-
 <br>
-
-<h2 align="middle">Section I: Intersection Testing, Ray Generation, Acceleration Structures</h2>
-
-<h3 align="middle">Part 1: Ray Generation and Scene Intersection:</h3>
-
-
-<div align = "left">
-<p class = "medium">
-<b><i>Overview of the Ray Casting Process:</i></b>
-</div>
-</p>
+<h2 align="left">Section I: Intersection Testing, Ray Generation, Acceleration Structures</h2>
+<h3 align="left">Part 1: Ray Generation and Scene Intersection:</h3>
 <div align = "justify">
 <p class = "medium">
+<b><i>Overview of the Ray Casting Process:</i></b><br>
 We can imagine looking at a grid of pixels. For each pixel <var>(x, y)</var> we need to somehow take an estimate of the radiance for this pixel, then write the corresponding
 Spectrum to a frame buffer. For this process, we will use Monte Carlo estimation, an interesting, compact and powerful estimation algorithm that will enable us to take an
 unbiased estimate of the radiance for each pixel. To that end, for each pixel, we will take <code>ns_aa samples</code>, where for each sample, we will take a random position in
