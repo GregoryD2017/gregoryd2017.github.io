@@ -4,9 +4,7 @@ layout: page
 hide: true
 ---
 
-# Volumetric Scattering
-
-## Introduction and Background:
+### Introduction and Background:
 
 Volumetric scattering is a really interesting effect. I actually worked on implementing a pathtracer previously; you can check out that project page [here](). In the simplest forms of forward pathtracing, we treat any non-scene element as empty space, that is to say, aside from the actual geometry of the scene, there is nothing for our rays to intersect. This gives very clean pure renders however, there are definitely limitations. The issue with this model is that realistically, the medium through which light moves it decidedly ***not*** empty. There can be dust, or water vapor, or realistically any number of suspended particulate matter, and light can interact with the vast majority of these particles. In fact, sometimes it is just these interactions with the medium through which the light propagates which induce some extremely beautiful effects. Thus, our old "empty space" model of pathtracing is limited in its ability to render scenes with media with which the light interacts, or in computer graphics terminology, *participating media*. Such effects as fog, god rays, smoke and many others can all be rendered using the conception of participating media, and that is the focus of this project.
 
