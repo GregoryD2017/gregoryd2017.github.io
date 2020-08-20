@@ -3,18 +3,31 @@ title: Volumetric Scattering
 layout: page
 hide: true
 ---
+<!DOCTYPE html>
+<style>
+  img {
+    margin: auto;
+    display: block;
+    max-width: 99%;
+    height: auto;
+    width: auto\9;
+  }
+</style>
 
-<!doctype html>
 <html>
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 <head>
 <meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
 </head>
-
 <body>
+This project is an extension of a pathtracer I worked on previously; feel free to take a look <a href="../pathtracer/pathtracer.html">here</a> if you're interested.
+<div align = "middle">
+  <img src="images/CBSpheres_1024_dim.png" align="middle" width="400"/>
+</div>
+
 <h3>Introduction and Background:</h3>
 <p> Volumetric scattering is a really interesting effect. I actually worked on implementing a pathtracer previously; you can check out that project page
-<a href="pathtracer/pathtracer.html">here</a>. In the simplest forms of forward pathtracing, we treat any non-scene element as empty space, that is
+<a href="../pathtracer/pathtracer.html">here</a>. In the simplest forms of forward pathtracing, we treat any non-scene element as empty space, that is
 to say, aside from the actual geometry of the scene, there is nothing for our rays to intersect. This gives very clean pure renders however, there are
 definitely limitations. The issue with this model is that realistically, the medium through which light moves it decidedly <strong><em>not</em></strong>
 empty. There can be dust, or water vapor, or realistically any number of suspended particulate matter, and light can interact with the vast majority of
@@ -131,6 +144,26 @@ we have a ray scene intersection.</p>
   implementation details in favor of a more intuitive understanding of the algorithm. For instance, the transmittance term is really computed following
   Beer&#39;s law, and further weighted by the extinction probability and scattering probabilities.</p>
 
+<h4>The Effect of Sample Rate of Volumetric Rendering:</h4>
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/CBspheres_64_dim.png" align="middle" width="400"/>
+        <figcaption>CBSpheres_Volumetric 64 Samples per Pixel</figcaption>
+      </td>
+      <td>
+        <img src="images/CBspheres_256_dim.png" align="middle" width="400"/>
+        <figcaption>CBSpheres_Volumetric 256 Samples per Pixel</figcaption>
+      </td>
+      <td>
+        <img src="images/CBspheres_1024_dim.png" align="middle" width="400"/>
+        <figcaption>CBSpheres_Volumetric 1024 Samples per Pixel</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
 <h3>Extension: Glimmering Particles:</h3>
 <p>One cool extension to traditional homogenous participating media are participating media with specific properties. One of those that I&#39;ve
   always found to be really cool are media that kind of glitter in the light. For reference, you can think of ice particles suspended in fog, or the
@@ -145,6 +178,22 @@ we have a ray scene intersection.</p>
   particles. I do this probabilistically per light-media intersection, and you can tune the probability so that you get the right distribution of
   glimmering particles to regular particles, but I used something like 1/10000. It isn&#39;t the best method aesthetically, but it is just as fast
   as normal volumetric path tracing, so it works as a basic proof of concept.</p>
+
+<div align = "middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/CBspheres_256_dim.png" align="middle" width="400"/>
+        <figcaption>CBSpheres_Volumetric 256 Samples per Pixel</figcaption>
+      </td>
+      <td>
+        <img src="images/CBspheres_256_glimmer.png" align="middle" width="400"/>
+        <figcaption>CBSpheres_Volumetric 256 Samples per Pixel (Glimmer)</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
 <br>
 <h3 align="left">Citations</h3>
 Click <a href="citations.html">here</a> to see a list of some of the resources that were super helpful in completing this project.
