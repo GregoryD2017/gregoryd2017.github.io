@@ -157,6 +157,7 @@
 	}
 
 	code {
+    color: rgb(224, 89, 89);
 		background: rgba(0, 0, 0, 0.05);
 		border-color: rgba(0, 0, 0, 0.2);
 		border-radius: 4px;
@@ -248,7 +249,7 @@
 		&.avatar48 {
 			width: 48px;
 			height: 48px;
-			background: #f00;
+			background: rgb(255, 255, 255);
 
 			img {
 				width: 48px;
@@ -699,19 +700,19 @@
 			}
 
 			&.shade-one {
-				background-color: #81918E;
+				background-color: #537791;
 			}
 
 			&.shade-two {
-				background-color: #f5fafa;
+				background-color: #e7e6e1;
 			}
 
 			&.shade-three {
-				background-color: #ecf1f1;
+				background-color: #c1c0b9;
 			}
 
 			&.shade-four {
-				background-color: #e8edec;
+				background-color: #f7f6e7;
 			}
 		}
 	}
