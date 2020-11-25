@@ -62,10 +62,10 @@
 	body {
 		background: #fff;
 		font-family: 'Source Sans Pro', sans-serif;
-		font-size: 19pt;
+		font-size: 16pt;
 		font-weight: 300;
-		line-height: 1.75em;
-		color: #888;
+		line-height: 1.5em;
+		color: rgb(56, 56, 56);
 
 		&.is-loading * {
 			@include vendor('transition', 'none !important');
@@ -75,15 +75,15 @@
 
 	input, textarea, select {
 		font-family: 'Source Sans Pro', sans-serif;
-		font-size: 19pt;
+		font-size: 16pt;
 		font-weight: 300;
-		line-height: 1.75em;
-		color: #888;
+		line-height: 1.5em;
+		color: rgb(56, 56, 56);
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		font-weight: 300;
-		color: #666;
+		font-weight: 400;
+		color: rgb(56, 56, 56);
 		line-height: 1.5em;
 	}
 
@@ -118,8 +118,8 @@
 	}
 
 	strong, b {
-		font-weight: 300;
-		color: #666;
+		font-weight: 500;
+		color: rgb(56, 56, 56);
 	}
 
 	em, i {
